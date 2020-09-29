@@ -22,8 +22,8 @@ namespace WpfApp1
                 {
                     if (Tiles[i, j] != null)
                     {
-                        Canvas.SetLeft(Tiles[i, j], left + i * 20 + 1);
-                        Canvas.SetTop(Tiles[i, j], top + j * 20 + 1);
+                        Canvas.SetLeft(Tiles[i, j], left + i * FieldHelper.BlockWidth + 1);
+                        Canvas.SetTop(Tiles[i, j], top + j * FieldHelper.BlockHeight + 1);
                     }
                 }
             }

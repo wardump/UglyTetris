@@ -59,7 +59,7 @@ namespace WpfApp1
                 {
                     w.fx = x;
                     w.fy = y;
-                    w.TestFigure.Draw(20 * x, 20 * y);
+                    w.TestFigure.Draw(FieldHelper.BlockWidth * x, FieldHelper.BlockHeight * y);
                 }
             }
         }

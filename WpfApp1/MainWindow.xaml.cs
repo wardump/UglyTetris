@@ -28,7 +28,7 @@ namespace WpfApp1
                 {null, null,  null, null}
             };
 
-            TestFigure.Draw(fx*20, fy*20);
+            TestFigure.Draw(fx*FieldHelper.BlockWidth, fy*FieldHelper.BlockHeight);
 
             DrawField();
 
@@ -86,8 +86,8 @@ namespace WpfApp1
                     if (Field[i,j] != null)
                     {
                         rectangles.Add(Field[i, j]);
-                        Canvas.SetLeft(Field[i, j], i * 20 + 1);
-                        Canvas.SetTop(Field[i, j], j * 20 + 1);
+                        Canvas.SetLeft(Field[i, j], i * FieldHelper.BlockWidth + 1);
+                        Canvas.SetTop(Field[i, j], j * FieldHelper.BlockHeight + 1);
                     }
                 }
             }
@@ -111,7 +111,7 @@ namespace WpfApp1
                 return;
             }
 
-            TestFigure.Draw(fx*20, fy*20);
+            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
@@ -124,7 +124,7 @@ namespace WpfApp1
                 return;
             }
 
-            TestFigure.Draw(fx*20, fy*20);
+            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
         }
 
         public bool Check(int x, int y)
@@ -176,7 +176,7 @@ namespace WpfApp1
             {
                 TestFigure.RotateRight();
             }
-            TestFigure.Draw(fx*20, fy*20);
+            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
@@ -186,7 +186,7 @@ namespace WpfApp1
             {
                 TestFigure.RotateLeft();
             }
-            TestFigure.Draw(fx*20, fy*20);
+            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
         }
 
         public static MainWindow Instance;
