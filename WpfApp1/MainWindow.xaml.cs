@@ -196,7 +196,7 @@ namespace WpfApp1
             TestFigure = new Figure();
 
             var r = new Random();
-            switch (r.Next(1, 4))
+            switch (r.Next(1, 5))
             {
                 case 1:
                     TestFigure.Tiles = new Rectangle[,]
