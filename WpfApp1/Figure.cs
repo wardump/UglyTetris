@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace WpfApp1
@@ -60,6 +62,55 @@ namespace WpfApp1
             }
 
             Tiles = newTiles;
+        }
+
+        public static Figure CreateRandomFigure(Func<Color, Rectangle> newRectangle)
+        {
+            var r = new Random();
+            var figure = new Figure();
+            switch (r.Next(1, 5))
+            {
+                case 1:
+                    figure.Tiles = new Rectangle[,]
+                    {
+                        {null, newRectangle(Colors.Red), newRectangle(Colors.Red), null},
+                        {null, null, newRectangle(Colors.Red), null},
+                        {null, null, newRectangle(Colors.Red), null},
+                        {null, null, null, null}
+                    };
+                    break;
+                case 2:
+                    figure.Tiles = new Rectangle[,]
+                    {
+                        {null, newRectangle(Colors.LawnGreen), newRectangle(Colors.LawnGreen), null},
+                        {null, newRectangle(Colors.LawnGreen), null, null},
+                        {null, newRectangle(Colors.LawnGreen), null, null},
+                        {null, null, null, null}
+                    };
+                    break;
+                case 3:
+                    figure.Tiles = new Rectangle[,]
+                    {
+                        {null, null, null, null},
+                        {null, newRectangle(Colors.Brown), newRectangle(Colors.Brown), null},
+                        {null, newRectangle(Colors.Brown), newRectangle(Colors.Brown), null},
+                        {null, null, null, null}
+                    };
+                    break;
+                case 4:
+                    figure.Tiles = new Rectangle[,]
+                    {
+                        {null, newRectangle(Colors.DeepSkyBlue), null, null},
+                        {null, newRectangle(Colors.DeepSkyBlue), null, null},
+                        {null, newRectangle(Colors.DeepSkyBlue), null, null},
+                        {null, newRectangle(Colors.DeepSkyBlue), null, null}
+                    };
+                    break;
+
+                //todo add more figures
+            }
+
+            return figure;
         }
     }
 }
