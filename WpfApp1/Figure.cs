@@ -14,11 +14,14 @@ namespace WpfApp1
             {null, null, null, null}
         };
 
+        public int Width => Tiles.GetUpperBound(0) + 1;
+        public int Height => Tiles.GetUpperBound(1) + 1;
+
         public void Draw(double left, double top)
         {
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < Width; i++)
             {
-                for (var j = 0; j < 4; j++)
+                for (var j = 0; j < Height; j++)
                 {
                     if (Tiles[i, j] != null)
                     {
@@ -31,13 +34,13 @@ namespace WpfApp1
 
         public void RotateLeft()
         {
-            var newTiles = new Rectangle[4, 4];
+            var newTiles = new Rectangle[Height, Width]; // rotation swaps coordinates
 
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < Width; i++)
             {
-                for (var j = 0; j < 4; j++)
+                for (var j = 0; j < Height; j++)
                 {
-                    newTiles[j, 3 - i] = Tiles[i, j];
+                    newTiles[j, Width - i - 1] = Tiles[i, j];
                 }
             }
 
@@ -46,13 +49,13 @@ namespace WpfApp1
 
         public void RotateRight()
         {
-            var newTiles = new Rectangle[4, 4];
+            var newTiles = new Rectangle[Height, Width]; // rotation swaps coordinates
 
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < Width; i++)
             {
-                for (var j = 0; j < 4; j++)
+                for (var j = 0; j < Height; j++)
                 {
-                    newTiles[3 - j, i] = Tiles[i, j];
+                    newTiles[Height - j - 1, i] = Tiles[i, j];
                 }
             }
 

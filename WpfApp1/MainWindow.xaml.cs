@@ -22,15 +22,16 @@ namespace WpfApp1
 
             TestFigure.Tiles = new Rectangle[,]
             {
-                {null, NewRectangle(), NewRectangle(), null},
-                {null, null,  NewRectangle(), null},
-                {null, null,  NewRectangle(), null},
+                {null, NewRectangle(Colors.Red), NewRectangle(Colors.Red), null},
+                {null, null,  NewRectangle(Colors.Red), null},
+                {null, null,  NewRectangle(Colors.Red), null},
                 {null, null,  null, null}
             };
 
             TestFigure.Draw(fx*FieldHelper.BlockWidth, fy*FieldHelper.BlockHeight);
 
-            DrawField();
+            Field = CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight);
+            RedrawField();
 
             timer = new System.Windows.Threading.DispatcherTimer {Interval = TimeSpan.FromMilliseconds(10)};
 
@@ -50,38 +51,40 @@ namespace WpfApp1
         public Game game = new Game();
         public System.Windows.Threading.DispatcherTimer timer;
 
-        public Rectangle[,] Field = new Rectangle[14,25];
+        public Rectangle[,] Field;
 
-        private void DrawField()
+        private Rectangle[,] CreateField(int width, int height)
         {
-            for (var i = 0; i < 25; i++)
+            var field = new Rectangle[width+2, height+1];
+
+            for (var i = 0; i < height+1; i++) // +1 each side for the walls
             {
-                Field[0,i] = NewColorRectangle(Colors.DimGray);
-                Field[13, i] = NewColorRectangle(Colors.DimGray);
+                field[0,i] = NewRectangle(Colors.DimGray);
+                field[width+1, i] = NewRectangle(Colors.DimGray);
             }
 
-            for (var i = 1; i < 13; i++)
+            for (var i = 1; i < width + 1; i++)
             {
-                Field[i, 24] = NewColorRectangle(Colors.DimGray);
+                field[i, height] = NewRectangle(Colors.DimGray);
             }
 
-            DrawField2();
+            return field;
         }
 
-        private void DrawField2()
+        private void RedrawField()
         {
             var rectangles = new HashSet<Rectangle>();
             
-            for (var i = 0; i < 4; i++)
-            for (var j = 0; j < 4; j++)
+            for (var i = 0; i < TestFigure.Width; i++)
+            for (var j = 0; j < TestFigure.Height; j++)
             {
                 if (TestFigure.Tiles[i, j] != null)
                     rectangles.Add(TestFigure.Tiles[i, j]);
             }
             
-            for (var i = 0; i < 14; i++)
+            for (var i = Field.GetLowerBound(0); i <= Field.GetUpperBound(0); i++)
             {
-                for (var j = 0; j < 25; j++)
+                for (var j = Field.GetLowerBound(1); j <= Field.GetUpperBound(1) ; j++)
                 {
                     if (Field[i,j] != null)
                     {
@@ -129,9 +132,9 @@ namespace WpfApp1
 
         public bool Check(int x, int y)
         {
-            for (var i = x; i < x + 4; i++)
+            for (var i = x; i < x + TestFigure.Width; i++)
             {
-                for (var j = y; j < y + 4; j++)
+                for (var j = y; j < y + TestFigure.Height; j++)
                 {
                     var r = TestFigure.Tiles[i - x, j - y];
                     if (r == null)
@@ -148,23 +151,15 @@ namespace WpfApp1
 
             return true;
         }
-
-        private Rectangle NewRectangle()
+        
+        private Rectangle NewRectangle(Color color)
         {
-            var r = new Rectangle();
-            r.Width = 18;
-            r.Height = 18;
-            r.Fill = new SolidColorBrush(Colors.Red);
-            MainCanvas.Children.Add(r);
-            return r;
-        }
-
-        private Rectangle NewColorRectangle(Color color)
-        {
-            var r = new Rectangle();
-            r.Width = 18;
-            r.Height = 18;
-            r.Fill = new SolidColorBrush(color);
+            var r = new Rectangle
+            {
+                Width = FieldHelper.BlockWidth * 0.9,
+                Height = FieldHelper.BlockHeight * 0.9,
+                Fill = new SolidColorBrush(color)
+            };
             MainCanvas.Children.Add(r);
             return r;
         }
@@ -201,18 +196,18 @@ namespace WpfApp1
                 case 1:
                     TestFigure.Tiles = new Rectangle[,]
                     {
-                        {null, NewRectangle(), NewRectangle(), null},
-                        {null, null, NewRectangle(), null},
-                        {null, null, NewRectangle(), null},
+                        {null, NewRectangle(Colors.Red), NewRectangle(Colors.Red), null},
+                        {null, null, NewRectangle(Colors.Red), null},
+                        {null, null, NewRectangle(Colors.Red), null},
                         {null, null, null, null}
                     };
                     break;
                 case 2:
                     TestFigure.Tiles = new Rectangle[,]
                     {
-                        {null, NewColorRectangle(Colors.LawnGreen), NewColorRectangle(Colors.LawnGreen), null},
-                        {null, NewColorRectangle(Colors.LawnGreen), null, null},
-                        {null, NewColorRectangle(Colors.LawnGreen), null, null},
+                        {null, NewRectangle(Colors.LawnGreen), NewRectangle(Colors.LawnGreen), null},
+                        {null, NewRectangle(Colors.LawnGreen), null, null},
+                        {null, NewRectangle(Colors.LawnGreen), null, null},
                         {null, null, null, null}
                     };
                     break;
@@ -220,18 +215,18 @@ namespace WpfApp1
                     TestFigure.Tiles = new Rectangle[,]
                     {
                         {null, null, null, null},
-                        {null, NewColorRectangle(Colors.Brown), NewColorRectangle(Colors.Brown), null},
-                        {null, NewColorRectangle(Colors.Brown), NewColorRectangle(Colors.Brown), null},
+                        {null, NewRectangle(Colors.Brown), NewRectangle(Colors.Brown), null},
+                        {null, NewRectangle(Colors.Brown), NewRectangle(Colors.Brown), null},
                         {null, null, null, null}
                     };
                     break;
                 case 4:
                     TestFigure.Tiles = new Rectangle[,]
                     {
-                        {null, NewColorRectangle(Colors.DeepSkyBlue), null, null},
-                        {null, NewColorRectangle(Colors.DeepSkyBlue), null, null},
-                        {null, NewColorRectangle(Colors.DeepSkyBlue), null, null},
-                        {null, NewColorRectangle(Colors.DeepSkyBlue), null, null}
+                        {null, NewRectangle(Colors.DeepSkyBlue), null, null},
+                        {null, NewRectangle(Colors.DeepSkyBlue), null, null},
+                        {null, NewRectangle(Colors.DeepSkyBlue), null, null},
+                        {null, NewRectangle(Colors.DeepSkyBlue), null, null}
                     };
                     break;
 
@@ -239,7 +234,7 @@ namespace WpfApp1
             }
 
 
-            DrawField2();
+            RedrawField();
             LineCountTextBlock.Text = game.Lines.ToString(CultureInfo.InvariantCulture);
 
             if (!FieldHelper.CheckFigure(Field, TestFigure, fx, fy))
