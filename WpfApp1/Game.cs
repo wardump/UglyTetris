@@ -25,21 +25,21 @@ namespace WpfApp1
 
             if (moveDown)
             {
-                var y = MainWindow.Instance.fy + 1;
-                var x = MainWindow.Instance.fx;
+                var y = MainWindow.Instance.FigurePositionY + 1;
+                var x = MainWindow.Instance.FigurePositionX;
 
                 var w = MainWindow.Instance;
 
                 if (!w.Check(x, y))
                 {
-                    var f = MainWindow.Instance.TestFigure;
+                    var f = MainWindow.Instance.Figure;
                     for (var i = f.Tiles.GetLowerBound(0); i <= f.Tiles.GetUpperBound(0); i++)
                     {
                         for (var j = f.Tiles.GetLowerBound(1); j <= f.Tiles.GetUpperBound(1); j++)
                         {
                             if (f.Tiles[i, j] != null)
                             {
-                                w.Field[w.fx + i, w.fy + j] = f.Tiles[i, j];
+                                w.Field[w.FigurePositionX + i, w.FigurePositionY + j] = f.Tiles[i, j];
                             }
                         }
                     }
@@ -48,8 +48,8 @@ namespace WpfApp1
 
                     Lines += lines;
 
-                    w.fx = 6;
-                    w.fy = 0;
+                    w.FigurePositionX = 6;
+                    w.FigurePositionY = 0;
                     w.SetRandomFigure();
                     
                     _tickCount = 0;
@@ -57,9 +57,9 @@ namespace WpfApp1
                 }
                 else
                 {
-                    w.fx = x;
-                    w.fy = y;
-                    w.TestFigure.Draw(FieldHelper.BlockWidth * x, FieldHelper.BlockHeight * y);
+                    w.FigurePositionX = x;
+                    w.FigurePositionY = y;
+                    w.Figure.Draw(FieldHelper.BlockWidth * x, FieldHelper.BlockHeight * y);
                 }
             }
         }

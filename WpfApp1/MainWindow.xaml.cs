@@ -20,47 +20,44 @@ namespace WpfApp1
             Instance = this;
             InitializeComponent();
 
-            TestFigure.Tiles = new Rectangle[,]
+            Figure.Tiles = new Rectangle[,]
             {
                 {null, NewRectangle(Colors.Red), NewRectangle(Colors.Red), null},
-                {null, null,  NewRectangle(Colors.Red), null},
-                {null, null,  NewRectangle(Colors.Red), null},
-                {null, null,  null, null}
+                {null, null, NewRectangle(Colors.Red), null},
+                {null, null, NewRectangle(Colors.Red), null},
+                {null, null, null, null}
             };
 
-            TestFigure.Draw(fx*FieldHelper.BlockWidth, fy*FieldHelper.BlockHeight);
+            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
 
             Field = CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight);
             RedrawField();
 
-            timer = new System.Windows.Threading.DispatcherTimer {Interval = TimeSpan.FromMilliseconds(10)};
+            _timer = new System.Windows.Threading.DispatcherTimer {Interval = TimeSpan.FromMilliseconds(10)};
 
-            timer.Tick += (sender, args) =>
-            {
-                game.Tick();
-            };
+            _timer.Tick += (sender, args) => { Game.Tick(); };
 
-            timer.Start();
+            _timer.Start();
         }
 
-        public Figure TestFigure = new Figure();
+        public Figure Figure = new Figure();
 
-        public int fx = 6;
-        public int fy = 0;
+        public int FigurePositionX = 6;
+        public int FigurePositionY = 0;
 
-        public Game game = new Game();
-        public System.Windows.Threading.DispatcherTimer timer;
+        public Game Game = new Game();
+        private System.Windows.Threading.DispatcherTimer _timer;
 
         public Rectangle[,] Field;
 
         private Rectangle[,] CreateField(int width, int height)
         {
-            var field = new Rectangle[width+2, height+1];
+            var field = new Rectangle[width + 2, height + 1];
 
-            for (var i = 0; i < height+1; i++) // +1 each side for the walls
+            for (var i = 0; i < height + 1; i++) // +1 each side for the walls
             {
-                field[0,i] = NewRectangle(Colors.DimGray);
-                field[width+1, i] = NewRectangle(Colors.DimGray);
+                field[0, i] = NewRectangle(Colors.DimGray);
+                field[width + 1, i] = NewRectangle(Colors.DimGray);
             }
 
             for (var i = 1; i < width + 1; i++)
@@ -74,19 +71,19 @@ namespace WpfApp1
         private void RedrawField()
         {
             var rectangles = new HashSet<Rectangle>();
-            
-            for (var i = 0; i < TestFigure.Width; i++)
-            for (var j = 0; j < TestFigure.Height; j++)
+
+            for (var i = 0; i < Figure.Width; i++)
+            for (var j = 0; j < Figure.Height; j++)
             {
-                if (TestFigure.Tiles[i, j] != null)
-                    rectangles.Add(TestFigure.Tiles[i, j]);
+                if (Figure.Tiles[i, j] != null)
+                    rectangles.Add(Figure.Tiles[i, j]);
             }
-            
+
             for (var i = Field.GetLowerBound(0); i <= Field.GetUpperBound(0); i++)
             {
-                for (var j = Field.GetLowerBound(1); j <= Field.GetUpperBound(1) ; j++)
+                for (var j = Field.GetLowerBound(1); j <= Field.GetUpperBound(1); j++)
                 {
-                    if (Field[i,j] != null)
+                    if (Field[i, j] != null)
                     {
                         rectangles.Add(Field[i, j]);
                         Canvas.SetLeft(Field[i, j], i * FieldHelper.BlockWidth + 1);
@@ -104,39 +101,69 @@ namespace WpfApp1
             }
         }
 
+        private void MoveLeft()
+        {
+            FigurePositionX--;
+
+            if (!Check(FigurePositionX, FigurePositionY))
+            {
+                FigurePositionX++;
+                return;
+            }
+
+            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+        }
+
+        private void MoveRight()
+        {
+            FigurePositionX++;
+
+            if (!Check(FigurePositionX, FigurePositionY))
+            {
+                FigurePositionX--;
+                return;
+            }
+
+            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            fx--;
-
-            if (!Check(fx, fy))
-            {
-                fx++;
-                return;
-            }
-
-            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
+            MoveLeft();
         }
 
-        private void Button_Click_3(object sender, RoutedEventArgs e)
+        private void RotateAntiClockWise()
         {
-            fx++;
-
-            if (!Check(fx, fy))
+            Figure.RotateLeft();
+            if (!Check(FigurePositionX, FigurePositionY))
             {
-                fx--;
-                return;
+                Figure.RotateRight();
             }
-
-            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
+            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
         }
 
+        private void RotateClockWise()
+        {
+            Figure.RotateRight();
+            if (!Check(FigurePositionX, FigurePositionY))
+            {
+                Figure.RotateLeft();
+            }
+            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+        }
+
+        private new void Drop()
+        {
+            Game.IsFalling = true;
+        }
+        
         public bool Check(int x, int y)
         {
-            for (var i = x; i < x + TestFigure.Width; i++)
+            for (var i = x; i < x + Figure.Width; i++)
             {
-                for (var j = y; j < y + TestFigure.Height; j++)
+                for (var j = y; j < y + Figure.Height; j++)
                 {
-                    var r = TestFigure.Tiles[i - x, j - y];
+                    var r = Figure.Tiles[i - x, j - y];
                     if (r == null)
                     {
                         continue;
@@ -164,37 +191,17 @@ namespace WpfApp1
             return r;
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            TestFigure.RotateLeft();
-            if (!Check(fx, fy))
-            {
-                TestFigure.RotateRight();
-            }
-            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
-        }
-
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            TestFigure.RotateRight();
-            if (!Check(fx, fy))
-            {
-                TestFigure.RotateLeft();
-            }
-            TestFigure.Draw(fx* FieldHelper.BlockWidth, fy* FieldHelper.BlockHeight);
-        }
-
         public static MainWindow Instance;
 
         public void SetRandomFigure()
         {
-            TestFigure = new Figure();
+            Figure = new Figure();
 
             var r = new Random();
             switch (r.Next(1, 5))
             {
                 case 1:
-                    TestFigure.Tiles = new Rectangle[,]
+                    Figure.Tiles = new Rectangle[,]
                     {
                         {null, NewRectangle(Colors.Red), NewRectangle(Colors.Red), null},
                         {null, null, NewRectangle(Colors.Red), null},
@@ -203,7 +210,7 @@ namespace WpfApp1
                     };
                     break;
                 case 2:
-                    TestFigure.Tiles = new Rectangle[,]
+                    Figure.Tiles = new Rectangle[,]
                     {
                         {null, NewRectangle(Colors.LawnGreen), NewRectangle(Colors.LawnGreen), null},
                         {null, NewRectangle(Colors.LawnGreen), null, null},
@@ -212,7 +219,7 @@ namespace WpfApp1
                     };
                     break;
                 case 3:
-                    TestFigure.Tiles = new Rectangle[,]
+                    Figure.Tiles = new Rectangle[,]
                     {
                         {null, null, null, null},
                         {null, NewRectangle(Colors.Brown), NewRectangle(Colors.Brown), null},
@@ -221,7 +228,7 @@ namespace WpfApp1
                     };
                     break;
                 case 4:
-                    TestFigure.Tiles = new Rectangle[,]
+                    Figure.Tiles = new Rectangle[,]
                     {
                         {null, NewRectangle(Colors.DeepSkyBlue), null, null},
                         {null, NewRectangle(Colors.DeepSkyBlue), null, null},
@@ -235,11 +242,11 @@ namespace WpfApp1
 
 
             RedrawField();
-            LineCountTextBlock.Text = game.Lines.ToString(CultureInfo.InvariantCulture);
+            LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
 
-            if (!FieldHelper.CheckFigure(Field, TestFigure, fx, fy))
+            if (!FieldHelper.CheckFigure(Field, Figure, FigurePositionX, FigurePositionY))
             {
-                timer.Stop();
+                _timer.Stop();
                 MessageBox.Show("GAME OVER");
             }
         }
@@ -253,30 +260,43 @@ namespace WpfApp1
 
             if (e.Key == Key.Left)
             {
-                Button_Click(sender, null);
+                MoveLeft();
             }
             else if (e.Key == Key.Right)
             {
-                Button_Click_3(sender, null);
+                MoveRight();
             }
             else if (e.Key == Key.Up)
             {
-                Button_Click_1(sender, null);
+                RotateAntiClockWise();
             }
             else if (e.Key == Key.Down)
             {
-                Button_Click_2(sender, null);
+                RotateClockWise();
             }
 
             else if (e.Key == Key.Space)
             {
-                game.IsFalling = true;
+                Drop();
             }
+        }
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            RotateAntiClockWise();
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            RotateClockWise();
+        }
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            MoveRight();
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            game.IsFalling = true;
+            Drop();
         }
     }
 }
