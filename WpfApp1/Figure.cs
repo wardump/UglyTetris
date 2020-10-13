@@ -18,24 +18,7 @@ namespace WpfApp1
 
         public int Width => Tiles.GetUpperBound(0) + 1;
         public int Height => Tiles.GetUpperBound(1) + 1;
-
-        public void Draw(double left, double top)
-        {
-            //TODO
-
-            //for (var i = 0; i < Width; i++)
-            //{
-            //    for (var j = 0; j < Height; j++)
-            //    {
-            //        if (Tiles[i, j] != null)
-            //        {
-            //            Canvas.SetLeft(Tiles[i, j], left + i * FieldHelper.BlockWidth + 1);
-            //            Canvas.SetTop(Tiles[i, j], top + j * FieldHelper.BlockHeight + 1);
-            //        }
-            //    }
-            //}
-        }
-
+        
         public void RotateLeft()
         {
             var newTiles = new Tile[Height, Width]; // rotation swaps coordinates

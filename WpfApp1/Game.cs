@@ -5,11 +5,17 @@ namespace WpfApp1
 {
     public class Game
     {
+        public Game(IDrawFigure drawFigure)
+        {
+            _drawFigure = drawFigure;
+        }
+
         public bool IsFalling { get; set; }
 
         private int _tickCount = 0;
 
         public int MoveDownPeriodTicks = 50;
+
         public int FallDownPeriodTicks = 3;
 
         public int Lines = 0;
@@ -40,6 +46,7 @@ namespace WpfApp1
                             if (f.Tiles[i, j] != null)
                             {
                                 Field[FigurePositionX + i, FigurePositionY + j] = f.Tiles[i, j];
+                                f.Tiles[i, j] = null;
                             }
                         }
                     }
@@ -47,6 +54,7 @@ namespace WpfApp1
                     var lines = FieldHelper.CheckLines(Field);
                     Lines += lines;
 
+                    _drawFigure.DrawFigure(Figure, x, y);
                     w.OnFigureLock();
                     
                     _tickCount = 0;
@@ -56,7 +64,7 @@ namespace WpfApp1
                 {
                     FigurePositionX = x;
                     FigurePositionY = y;
-                    Figure.Draw(FieldHelper.BlockWidth * x, FieldHelper.BlockHeight * y);
+                    _drawFigure.DrawFigure(Figure, x, y);
                 }
             }
         }
@@ -71,7 +79,7 @@ namespace WpfApp1
                 return;
             }
 
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
         }
 
         public void MoveRight()
@@ -84,7 +92,7 @@ namespace WpfApp1
                 return;
             }
 
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
         }
 
         public void RotateAntiClockWise()
@@ -94,7 +102,7 @@ namespace WpfApp1
             {
                 Figure.RotateRight();
             }
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
         }
 
         public void RotateClockWise()
@@ -104,7 +112,7 @@ namespace WpfApp1
             {
                 Figure.RotateLeft();
             }
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
         }
 
         public void Drop()
@@ -133,9 +141,11 @@ namespace WpfApp1
 
             return true;
         }
-        
+
         public Figure Figure { get; private set; } = new Figure();
+
         public int FigurePositionX { get; private set; } = 6;
+
         public int FigurePositionY { get; private set; } = 0;
 
         public Tile[,] Field;
@@ -153,5 +163,7 @@ namespace WpfApp1
 
             return false; //cannot reset figure
         }
+
+        private IDrawFigure _drawFigure;
     }
 }

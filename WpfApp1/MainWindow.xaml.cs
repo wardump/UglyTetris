@@ -19,6 +19,11 @@ namespace WpfApp1
         {
             Instance = this;
             InitializeComponent();
+            
+            _figureDrawer = new FigureDrawer(new TileDrawer(MainCanvas));
+            _fieldDrawer = new FieldDrawer(new TileDrawer(MainCanvas));
+
+            Game = new Game(_figureDrawer);
 
             Game.Figure.Tiles = new Tile[,]
             {
@@ -28,10 +33,12 @@ namespace WpfApp1
                 {null, null, null, null}
             };
 
-            Game.Figure.Draw(Game.FigurePositionX * FieldHelper.BlockWidth, Game.FigurePositionY * FieldHelper.BlockHeight);
-
+            _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
+            
             Game.Field = CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight);
-            RedrawField();
+            
+            _fieldDrawer.DrawField(Game.Field);
+
 
             _timer = new System.Windows.Threading.DispatcherTimer {Interval = TimeSpan.FromMilliseconds(10)};
 
@@ -40,11 +47,12 @@ namespace WpfApp1
             _timer.Start();
         }
 
-        private readonly Dictionary<Tile, Rectangle> _tileRectangleMap = new Dictionary<Tile, Rectangle>();
-
-        public Game Game = new Game();
+        
+        public Game Game;
         private readonly System.Windows.Threading.DispatcherTimer _timer;
 
+        private FieldDrawer _fieldDrawer;
+        private FigureDrawer _figureDrawer;
 
         private Tile[,] CreateField(int width, int height)
         {
@@ -63,60 +71,7 @@ namespace WpfApp1
 
             return field;
         }
-
-        private Rectangle RedrawTile(Tile tile, int x, int y)
-        {
-            Rectangle rectangle;
-
-            if (_tileRectangleMap.ContainsKey(tile))
-            {
-                rectangle = _tileRectangleMap[tile];
-            }
-            else
-            {
-                rectangle = NewRectangle(tile.Color);
-                _tileRectangleMap.Add(tile, rectangle);
-            }
-
-            Canvas.SetLeft(rectangle, x * FieldHelper.BlockWidth + 1);
-            Canvas.SetTop(rectangle, y * FieldHelper.BlockHeight + 1);
-
-            return rectangle;
-        }
-
-        private void RedrawField()
-        {
-            var rectangles = new HashSet<Rectangle>();
-
-            for (var i = 0; i < Game.Figure.Width; i++)
-            for (var j = 0; j < Game.Figure.Height; j++)
-            {
-                var tile = Game.Figure.Tiles[i, j];
-                if (tile != null)
-                {
-                    var rectangle = RedrawTile(tile, Game.FigurePositionX + i, Game.FigurePositionY + j);
-                    rectangles.Add(rectangle);
-                }
-            }
-
-            for (var i = Game.Field.GetLowerBound(0); i <= Game.Field.GetUpperBound(0); i++)
-            {
-                for (var j = Game.Field.GetLowerBound(1); j <= Game.Field.GetUpperBound(1); j++)
-                {
-                    var tile = Game.Field[i, j];
-                    if (tile != null)
-                    {
-                        var rectangle = RedrawTile(tile, i, j);
-                        rectangles.Add(rectangle);
-                    }
-                }
-            }
-
-            foreach (var rect in MainCanvas.Children.OfType<Rectangle>().Where(rect => !rectangles.Contains(rect)).ToList())
-            {
-                MainCanvas.Children.Remove(rect);
-            }
-        }
+        
 
         private void MoveLeft()
         {
@@ -148,24 +103,12 @@ namespace WpfApp1
             Game.Drop();
         }
         
-        private Rectangle NewRectangle(Color color)
-        {
-            var r = new Rectangle
-            {
-                Width = FieldHelper.BlockWidth * 0.9,
-                Height = FieldHelper.BlockHeight * 0.9,
-                Fill = new SolidColorBrush(color)
-            };
-            MainCanvas.Children.Add(r);
-            return r;
-        }
-
         public static MainWindow Instance;
         
 
         public void OnFigureLock()
         {
-            RedrawField();
+            _fieldDrawer.DrawField(Game.Field);
             LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
 
             if (!Game.ResetFigure(Figure.CreateRandomFigure()))
