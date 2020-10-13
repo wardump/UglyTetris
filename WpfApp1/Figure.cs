@@ -8,7 +8,7 @@ namespace WpfApp1
 {
     public class Figure
     {
-        public Rectangle[,] Tiles = new Rectangle[,]
+        public Tile[,] Tiles = new Tile[,]
         {
             {null, null, null, null},
             {null, null, null, null},
@@ -21,22 +21,24 @@ namespace WpfApp1
 
         public void Draw(double left, double top)
         {
-            for (var i = 0; i < Width; i++)
-            {
-                for (var j = 0; j < Height; j++)
-                {
-                    if (Tiles[i, j] != null)
-                    {
-                        Canvas.SetLeft(Tiles[i, j], left + i * FieldHelper.BlockWidth + 1);
-                        Canvas.SetTop(Tiles[i, j], top + j * FieldHelper.BlockHeight + 1);
-                    }
-                }
-            }
+            //TODO
+
+            //for (var i = 0; i < Width; i++)
+            //{
+            //    for (var j = 0; j < Height; j++)
+            //    {
+            //        if (Tiles[i, j] != null)
+            //        {
+            //            Canvas.SetLeft(Tiles[i, j], left + i * FieldHelper.BlockWidth + 1);
+            //            Canvas.SetTop(Tiles[i, j], top + j * FieldHelper.BlockHeight + 1);
+            //        }
+            //    }
+            //}
         }
 
         public void RotateLeft()
         {
-            var newTiles = new Rectangle[Height, Width]; // rotation swaps coordinates
+            var newTiles = new Tile[Height, Width]; // rotation swaps coordinates
 
             for (var i = 0; i < Width; i++)
             {
@@ -51,7 +53,7 @@ namespace WpfApp1
 
         public void RotateRight()
         {
-            var newTiles = new Rectangle[Height, Width]; // rotation swaps coordinates
+            var newTiles = new Tile[Height, Width]; // rotation swaps coordinates
 
             for (var i = 0; i < Width; i++)
             {
@@ -64,46 +66,46 @@ namespace WpfApp1
             Tiles = newTiles;
         }
 
-        public static Figure CreateRandomFigure(Func<Color, Rectangle> newRectangle)
+        public static Figure CreateRandomFigure()
         {
             var r = new Random();
             var figure = new Figure();
             switch (r.Next(1, 5))
             {
                 case 1:
-                    figure.Tiles = new Rectangle[,]
+                    figure.Tiles = new Tile[,]
                     {
-                        {null, newRectangle(Colors.Red), newRectangle(Colors.Red), null},
-                        {null, null, newRectangle(Colors.Red), null},
-                        {null, null, newRectangle(Colors.Red), null},
+                        {null, new Tile(Colors.Red), new Tile(Colors.Red), null},
+                        {null, null, new Tile(Colors.Red), null},
+                        {null, null, new Tile(Colors.Red), null},
                         {null, null, null, null}
                     };
                     break;
                 case 2:
-                    figure.Tiles = new Rectangle[,]
+                    figure.Tiles = new Tile[,]
                     {
-                        {null, newRectangle(Colors.LawnGreen), newRectangle(Colors.LawnGreen), null},
-                        {null, newRectangle(Colors.LawnGreen), null, null},
-                        {null, newRectangle(Colors.LawnGreen), null, null},
+                        {null, new Tile(Colors.LawnGreen), new Tile(Colors.LawnGreen), null},
+                        {null, new Tile(Colors.LawnGreen), null, null},
+                        {null, new Tile(Colors.LawnGreen), null, null},
                         {null, null, null, null}
                     };
                     break;
                 case 3:
-                    figure.Tiles = new Rectangle[,]
+                    figure.Tiles = new Tile[,]
                     {
                         {null, null, null, null},
-                        {null, newRectangle(Colors.Brown), newRectangle(Colors.Brown), null},
-                        {null, newRectangle(Colors.Brown), newRectangle(Colors.Brown), null},
+                        {null, new Tile(Colors.Brown), new Tile(Colors.Brown), null},
+                        {null, new Tile(Colors.Brown), new Tile(Colors.Brown), null},
                         {null, null, null, null}
                     };
                     break;
                 case 4:
-                    figure.Tiles = new Rectangle[,]
+                    figure.Tiles = new Tile[,]
                     {
-                        {null, newRectangle(Colors.DeepSkyBlue), null, null},
-                        {null, newRectangle(Colors.DeepSkyBlue), null, null},
-                        {null, newRectangle(Colors.DeepSkyBlue), null, null},
-                        {null, newRectangle(Colors.DeepSkyBlue), null, null}
+                        {null, new Tile(Colors.DeepSkyBlue), null, null},
+                        {null, new Tile(Colors.DeepSkyBlue), null, null},
+                        {null, new Tile(Colors.DeepSkyBlue), null, null},
+                        {null, new Tile(Colors.DeepSkyBlue), null, null}
                     };
                     break;
 

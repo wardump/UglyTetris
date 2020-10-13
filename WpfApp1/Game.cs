@@ -138,7 +138,7 @@ namespace WpfApp1
         public int FigurePositionX { get; private set; } = 6;
         public int FigurePositionY { get; private set; } = 0;
 
-        public Rectangle[,] Field;
+        public Tile[,] Field;
 
         public bool ResetFigure(Figure newFigure)
         {

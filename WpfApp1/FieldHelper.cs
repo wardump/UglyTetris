@@ -10,7 +10,7 @@ namespace WpfApp1
         public static int FieldDefaultWidth = 12;
         public static int FieldDefaultHeight = 24;
 
-        public static int CheckLines(Rectangle[,] field)
+        public static int CheckLines(Tile[,] field)
         {
             var left = field.GetLowerBound(0) + 1;
             var right = field.GetUpperBound(0) - 1;
@@ -47,7 +47,7 @@ namespace WpfApp1
             return remove;
         }
 
-        public static bool CheckFigure(Rectangle[,] field, Figure f, int figureX, int figureY)
+        public static bool CheckFigure(Tile[,] field, Figure f, int figureX, int figureY)
         {
             var left = field.GetLowerBound(0) + 1;
             var right = field.GetUpperBound(0) - 1;

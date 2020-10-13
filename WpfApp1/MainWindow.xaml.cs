@@ -20,11 +20,11 @@ namespace WpfApp1
             Instance = this;
             InitializeComponent();
 
-            Game.Figure.Tiles = new Rectangle[,]
+            Game.Figure.Tiles = new Tile[,]
             {
-                {null, NewRectangle(Colors.Red), NewRectangle(Colors.Red), null},
-                {null, null, NewRectangle(Colors.Red), null},
-                {null, null, NewRectangle(Colors.Red), null},
+                {null, new Tile(Colors.Red), new Tile(Colors.Red), null},
+                {null, null, new Tile(Colors.Red), null},
+                {null, null, new Tile(Colors.Red), null},
                 {null, null, null, null}
             };
 
@@ -40,28 +40,48 @@ namespace WpfApp1
             _timer.Start();
         }
 
-
+        private readonly Dictionary<Tile, Rectangle> _tileRectangleMap = new Dictionary<Tile, Rectangle>();
 
         public Game Game = new Game();
-        private System.Windows.Threading.DispatcherTimer _timer;
+        private readonly System.Windows.Threading.DispatcherTimer _timer;
 
 
-        private Rectangle[,] CreateField(int width, int height)
+        private Tile[,] CreateField(int width, int height)
         {
-            var field = new Rectangle[width + 2, height + 1];
+            var field = new Tile[width + 2, height + 1];
 
             for (var i = 0; i < height + 1; i++) // +1 each side for the walls
             {
-                field[0, i] = NewRectangle(Colors.DimGray);
-                field[width + 1, i] = NewRectangle(Colors.DimGray);
+                field[0, i] = new Tile(Colors.DimGray);
+                field[width + 1, i] = new Tile(Colors.DimGray);
             }
 
             for (var i = 1; i < width + 1; i++)
             {
-                field[i, height] = NewRectangle(Colors.DimGray);
+                field[i, height] = new Tile(Colors.DimGray);
             }
 
             return field;
+        }
+
+        private Rectangle RedrawTile(Tile tile, int x, int y)
+        {
+            Rectangle rectangle;
+
+            if (_tileRectangleMap.ContainsKey(tile))
+            {
+                rectangle = _tileRectangleMap[tile];
+            }
+            else
+            {
+                rectangle = NewRectangle(tile.Color);
+                _tileRectangleMap.Add(tile, rectangle);
+            }
+
+            Canvas.SetLeft(rectangle, x * FieldHelper.BlockWidth + 1);
+            Canvas.SetTop(rectangle, y * FieldHelper.BlockHeight + 1);
+
+            return rectangle;
         }
 
         private void RedrawField()
@@ -71,29 +91,30 @@ namespace WpfApp1
             for (var i = 0; i < Game.Figure.Width; i++)
             for (var j = 0; j < Game.Figure.Height; j++)
             {
-                if (Game.Figure.Tiles[i, j] != null)
-                    rectangles.Add(Game.Figure.Tiles[i, j]);
+                var tile = Game.Figure.Tiles[i, j];
+                if (tile != null)
+                {
+                    var rectangle = RedrawTile(tile, Game.FigurePositionX + i, Game.FigurePositionY + j);
+                    rectangles.Add(rectangle);
+                }
             }
 
             for (var i = Game.Field.GetLowerBound(0); i <= Game.Field.GetUpperBound(0); i++)
             {
                 for (var j = Game.Field.GetLowerBound(1); j <= Game.Field.GetUpperBound(1); j++)
                 {
-                    if (Game.Field[i, j] != null)
+                    var tile = Game.Field[i, j];
+                    if (tile != null)
                     {
-                        rectangles.Add(Game.Field[i, j]);
-                        Canvas.SetLeft(Game.Field[i, j], i * FieldHelper.BlockWidth + 1);
-                        Canvas.SetTop(Game.Field[i, j], j * FieldHelper.BlockHeight + 1);
+                        var rectangle = RedrawTile(tile, i, j);
+                        rectangles.Add(rectangle);
                     }
                 }
             }
 
-            foreach (var rect in MainCanvas.Children.OfType<Rectangle>().ToList())
+            foreach (var rect in MainCanvas.Children.OfType<Rectangle>().Where(rect => !rectangles.Contains(rect)).ToList())
             {
-                if (!rectangles.Contains(rect))
-                {
-                    MainCanvas.Children.Remove(rect);
-                }
+                MainCanvas.Children.Remove(rect);
             }
         }
 
@@ -147,7 +168,7 @@ namespace WpfApp1
             RedrawField();
             LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
 
-            if (!Game.ResetFigure(Figure.CreateRandomFigure(NewRectangle)))
+            if (!Game.ResetFigure(Figure.CreateRandomFigure()))
             {
                _timer.Stop();
                 MessageBox.Show("GAME OVER");
