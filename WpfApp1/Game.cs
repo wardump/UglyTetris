@@ -1,5 +1,7 @@
 ﻿
+using System;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace WpfApp1
 {
@@ -40,13 +42,14 @@ namespace WpfApp1
                             if (f.Tiles[i, j] != null)
                             {
                                 Field[FigurePositionX + i, FigurePositionY + j] = f.Tiles[i, j];
+                                f.Tiles[i, j] = null;
                             }
                         }
                     }
 
                     var lines = FieldHelper.CheckLines(Field);
                     Lines += lines;
-
+                    
                     w.OnFigureLock();
                     
                     _tickCount = 0;
@@ -56,7 +59,7 @@ namespace WpfApp1
                 {
                     FigurePositionX = x;
                     FigurePositionY = y;
-                    Figure.Draw(FieldHelper.BlockWidth * x, FieldHelper.BlockHeight * y);
+                    FigureChange?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -70,8 +73,7 @@ namespace WpfApp1
                 FigurePositionX++;
                 return;
             }
-
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            FigureChange?.Invoke(this, EventArgs.Empty);
         }
 
         public void MoveRight()
@@ -83,8 +85,7 @@ namespace WpfApp1
                 FigurePositionX--;
                 return;
             }
-
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            FigureChange?.Invoke(this, EventArgs.Empty);
         }
 
         public void RotateAntiClockWise()
@@ -94,7 +95,7 @@ namespace WpfApp1
             {
                 Figure.RotateRight();
             }
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            FigureChange?.Invoke(this, EventArgs.Empty);
         }
 
         public void RotateClockWise()
@@ -104,7 +105,7 @@ namespace WpfApp1
             {
                 Figure.RotateLeft();
             }
-            Figure.Draw(FigurePositionX * FieldHelper.BlockWidth, FigurePositionY * FieldHelper.BlockHeight);
+            FigureChange?.Invoke(this, EventArgs.Empty);
         }
 
         public void Drop()
@@ -133,7 +134,9 @@ namespace WpfApp1
 
             return true;
         }
-        
+
+        public event EventHandler FigureChange;
+
         public Figure Figure { get; private set; } = new Figure();
         public int FigurePositionX { get; private set; } = 6;
         public int FigurePositionY { get; private set; } = 0;
@@ -142,16 +145,26 @@ namespace WpfApp1
 
         public bool ResetFigure(Figure newFigure)
         {
-            FigurePositionX = 6; //todo calculate from field size
-            FigurePositionY = 0;
+            (int x, int y) = GetFigureStartPosition();
 
-            if (FieldHelper.CheckFigure(Field, newFigure, FigurePositionX, FigurePositionY))
+            if (FieldHelper.CheckFigure(Field, newFigure, x, y))
             {
                 Figure = newFigure;
+
+                FigurePositionX = x;
+                FigurePositionY = y;
+
+                FigureChange?.Invoke(this, EventArgs.Empty);
+
                 return true;
             }
 
             return false; //cannot reset figure
+        }
+
+        private (int x, int y) GetFigureStartPosition()
+        {
+            return (FieldHelper.FieldDefaultWidth / 2, 0);
         }
     }
 }

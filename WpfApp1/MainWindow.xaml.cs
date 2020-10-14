@@ -27,17 +27,23 @@ namespace WpfApp1
                 {null, null, new Tile(Colors.Red), null},
                 {null, null, null, null}
             };
-
-            Game.Figure.Draw(Game.FigurePositionX * FieldHelper.BlockWidth, Game.FigurePositionY * FieldHelper.BlockHeight);
-
+            
             Game.Field = CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight);
-            RedrawField();
+
+            Game.FigureChange += GameOnFigureChange;
+
+            RedrawField(true, true);
 
             _timer = new System.Windows.Threading.DispatcherTimer {Interval = TimeSpan.FromMilliseconds(10)};
 
             _timer.Tick += (sender, args) => { Game.Tick(); };
 
             _timer.Start();
+        }
+
+        private void GameOnFigureChange(object? sender, EventArgs e)
+        {
+            RedrawField(false, true);
         }
 
         private readonly Dictionary<Tile, Rectangle> _tileRectangleMap = new Dictionary<Tile, Rectangle>();
@@ -83,10 +89,10 @@ namespace WpfApp1
 
             return rectangle;
         }
-
-        private void RedrawField()
+        
+        private void RedrawField(bool redrawField, bool redrawFigure)
         {
-            var rectangles = new HashSet<Rectangle>();
+            var tiles = new HashSet<Tile>();
 
             for (var i = 0; i < Game.Figure.Width; i++)
             for (var j = 0; j < Game.Figure.Height; j++)
@@ -94,8 +100,12 @@ namespace WpfApp1
                 var tile = Game.Figure.Tiles[i, j];
                 if (tile != null)
                 {
-                    var rectangle = RedrawTile(tile, Game.FigurePositionX + i, Game.FigurePositionY + j);
-                    rectangles.Add(rectangle);
+                    if (redrawFigure)
+                    {
+                        RedrawTile(tile, Game.FigurePositionX + i, Game.FigurePositionY + j);
+                    }
+
+                    tiles.Add(tile);
                 }
             }
 
@@ -106,15 +116,23 @@ namespace WpfApp1
                     var tile = Game.Field[i, j];
                     if (tile != null)
                     {
-                        var rectangle = RedrawTile(tile, i, j);
-                        rectangles.Add(rectangle);
+                        if (redrawField)
+                        {
+                            RedrawTile(tile, i, j);
+                        }
+
+                        tiles.Add(tile);
                     }
                 }
             }
 
-            foreach (var rect in MainCanvas.Children.OfType<Rectangle>().Where(rect => !rectangles.Contains(rect)).ToList())
+            var orphanedTiles = _tileRectangleMap.Keys.Where(t => !tiles.Contains(t)).ToList();
+
+            foreach (var orphanedTile in orphanedTiles)
             {
-                MainCanvas.Children.Remove(rect);
+                var rectangle = _tileRectangleMap[orphanedTile];
+                MainCanvas.Children.Remove(rectangle);
+                _tileRectangleMap.Remove(orphanedTile);
             }
         }
 
@@ -165,7 +183,7 @@ namespace WpfApp1
 
         public void OnFigureLock()
         {
-            RedrawField();
+            RedrawField(true, true);
             LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
 
             if (!Game.ResetFigure(Figure.CreateRandomFigure()))
