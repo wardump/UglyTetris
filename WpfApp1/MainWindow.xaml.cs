@@ -23,7 +23,8 @@ namespace WpfApp1
             _figureDrawer = new FigureDrawer(new TileDrawer(MainCanvas));
             _fieldDrawer = new FieldDrawer(new TileDrawer(MainCanvas));
 
-            Game = new Game(_figureDrawer);
+            Game = new Game();
+            Game.FigureStateChanged += GameOnFigureStateChanged;
 
             Game.Figure.Tiles = new Tile[,]
             {
@@ -47,7 +48,12 @@ namespace WpfApp1
             _timer.Start();
         }
 
-        
+        private void GameOnFigureStateChanged(object? sender, EventArgs e)
+        {
+            _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
+        }
+
+
         public Game Game;
         private readonly System.Windows.Threading.DispatcherTimer _timer;
 

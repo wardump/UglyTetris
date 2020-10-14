@@ -1,15 +1,11 @@
 ﻿
+using System;
 using System.Windows.Shapes;
 
 namespace WpfApp1
 {
     public class Game
     {
-        public Game(IDrawFigure drawFigure)
-        {
-            _drawFigure = drawFigure;
-        }
-
         public bool IsFalling { get; set; }
 
         private int _tickCount = 0;
@@ -54,7 +50,7 @@ namespace WpfApp1
                     var lines = FieldHelper.CheckLines(Field);
                     Lines += lines;
 
-                    _drawFigure.DrawFigure(Figure, x, y);
+                    RaiseFigureStateChanged();
                     w.OnFigureLock();
                     
                     _tickCount = 0;
@@ -64,7 +60,7 @@ namespace WpfApp1
                 {
                     FigurePositionX = x;
                     FigurePositionY = y;
-                    _drawFigure.DrawFigure(Figure, x, y);
+                    RaiseFigureStateChanged();
                 }
             }
         }
@@ -79,7 +75,7 @@ namespace WpfApp1
                 return;
             }
 
-            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
+            RaiseFigureStateChanged();
         }
 
         public void MoveRight()
@@ -92,7 +88,7 @@ namespace WpfApp1
                 return;
             }
 
-            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
+            RaiseFigureStateChanged();
         }
 
         public void RotateAntiClockWise()
@@ -102,7 +98,7 @@ namespace WpfApp1
             {
                 Figure.RotateRight();
             }
-            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
+            RaiseFigureStateChanged();
         }
 
         public void RotateClockWise()
@@ -112,7 +108,7 @@ namespace WpfApp1
             {
                 Figure.RotateLeft();
             }
-            _drawFigure.DrawFigure(Figure, FigurePositionX, FigurePositionY);
+            RaiseFigureStateChanged();
         }
 
         public void Drop()
@@ -144,6 +140,13 @@ namespace WpfApp1
 
         public Figure Figure { get; private set; } = new Figure();
 
+        public event EventHandler FigureStateChanged;
+
+        protected void RaiseFigureStateChanged()
+        {
+            FigureStateChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         public int FigurePositionX { get; private set; } = 6;
 
         public int FigurePositionY { get; private set; } = 0;
@@ -163,7 +166,5 @@ namespace WpfApp1
 
             return false; //cannot reset figure
         }
-
-        private IDrawFigure _drawFigure;
     }
 }
