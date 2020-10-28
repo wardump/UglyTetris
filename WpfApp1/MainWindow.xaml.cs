@@ -25,19 +25,11 @@ namespace WpfApp1
 
             Game = new Game();
             Game.FigureStateChanged += GameOnFigureStateChanged;
-
-            Game.Figure.Tiles = new Tile[,]
-            {
-                {null, new Tile(Colors.Red), new Tile(Colors.Red), null},
-                {null, null, new Tile(Colors.Red), null},
-                {null, null, new Tile(Colors.Red), null},
-                {null, null, null, null}
-            };
-
-            _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
             
             Game.Field = CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight);
-            
+            Game.ResetFigure(_figureFactory.CreateRandomFigure());
+
+            _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
             _fieldDrawer.DrawField(Game.Field);
 
 
@@ -110,14 +102,17 @@ namespace WpfApp1
         }
         
         public static MainWindow Instance;
-        
+
+        private FigureFactory _figureFactory = new FigureFactory();
 
         public void OnFigureLock()
         {
             _fieldDrawer.DrawField(Game.Field);
             LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
 
-            if (!Game.ResetFigure(Figure.CreateRandomFigure()))
+            var figure = _figureFactory.CreateRandomFigure();
+
+            if (!Game.ResetFigure(figure))
             {
                _timer.Stop();
                 MessageBox.Show("GAME OVER");

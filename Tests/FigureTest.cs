@@ -1,22 +1,24 @@
 using System;
+using System.Windows.Media;
 using FluentAssertions;
 using WpfApp1;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Tests
 {
     public class FigureTest
     {
-        [Fact]
-        public void RotateRightLeftShouldNotChange()
+        [Theory]
+        [InlineData(FigureType.I)]
+        [InlineData(FigureType.J)]
+        public void RotateRightLeftShouldNotChange(FigureType figureType)
         {
-            // this test is bad because it is not consistent
-            // It relies on random figure
-            // We should create a set of non-random figures, but current Figure class does not allow
-            // TODO refactor code and extract figure factory
-            var figure = Figure.CreateRandomFigure();
+            var figureFactory = new FigureFactory();
 
-            var newFigure = CopyFigure(figure);
+            var figure = figureFactory.CreateStandardFigure(figureType);
+
+            var newFigure = new Figure(figure);
 
             newFigure.Should().BeEquivalentTo(figure);
 
@@ -38,10 +40,11 @@ namespace Tests
             // this test is bad because it is not consistent
             // It relies on random figure
             // We should create a set of non-random figures, but current Figure class does not allow
-            // TODO refactor code and extract figure factory
-            var figure = Figure.CreateRandomFigure();
+            
+            var figureFactory = new FigureFactory();
+            var figure = figureFactory.CreateRandomFigure();
 
-            var newFigure = CopyFigure(figure);
+            var newFigure = new Figure(figure);
 
             newFigure.Should().BeEquivalentTo(figure);
             
@@ -59,10 +62,11 @@ namespace Tests
             // this test is bad because it is not consistent
             // It relies on random figure
             // We should create a set of non-random figures, but current Figure class does not allow
-            // TODO refactor code and extract figure factory
-            var figure = Figure.CreateRandomFigure();
 
-            var newFigure = CopyFigure(figure);
+            var figureFactory = new FigureFactory();
+            var figure = figureFactory.CreateRandomFigure();
+
+            var newFigure = new Figure(figure);
 
             newFigure.Should().BeEquivalentTo(figure);
 
@@ -74,20 +78,28 @@ namespace Tests
             newFigure.Should().BeEquivalentTo(figure);
         }
 
-        private Figure CopyFigure(Figure figure)
+
+        [Theory]
+        [InlineData("  x \r\n  x \r\n  x \r\n  x ", "    \r\nxxxx\r\n    \r\n    ")]
+        public void RotateLeft(string figureTiles, string figureTilesRotated)
         {
-            var newFigure = new Figure();
+            var figure = new Figure(figureTiles, Colors.Yellow);
+            var figureRotated = new Figure(figureTilesRotated, Colors.Yellow);
 
-            newFigure.Tiles = new Tile[figure.Width, figure.Height];
+            figure.RotateLeft();
 
-            for (var x = 0; x < figure.Width; x++)
-            for (var y = 0; y < figure.Height; y++)
+            figure.Should().BeEquivalentTo(figureRotated);
+        }
+
+        [Fact]
+        public void CreateRandomFigure()
+        {
+            var figureFactory = new FigureFactory();
+
+            for (var i = 0; i < 100; i++)
             {
-                var tile = figure.Tiles[x, y];
-                newFigure.Tiles[x, y] = tile == null ? null : new Tile(tile.Color);
+                var figure = figureFactory.CreateRandomFigure();
             }
-
-            return newFigure;
         }
     }
 }

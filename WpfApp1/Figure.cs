@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -8,6 +9,51 @@ namespace WpfApp1
 {
     public class Figure
     {
+        public Figure()
+        {
+            
+        }
+
+        public Figure(Figure figure)
+        {
+            Tiles = new Tile[figure.Width, figure.Height];
+
+            for (var x = 0; x < figure.Width; x++)
+            for (var y = 0; y < figure.Height; y++)
+            {
+                var tile = figure.Tiles[x, y];
+                Tiles[x, y] = tile == null ? null : new Tile(tile.Color);
+            }
+        }
+
+        public Figure(string tileMap, Color color)
+        {
+            var lines = tileMap.Split(Environment.NewLine);
+
+            var width = lines.Max(l => l.Length);
+            var height = lines.Length;
+
+            Tiles = new Tile[width, height];
+
+            for (var y = 0; y < height; y++)
+            {
+                var line = lines[y];
+                for (var x = 0; x < width; x++)
+                {
+                    char c = ' ';
+
+                    if (x < line.Length)
+                    {
+                        c = line[x];
+                    }
+
+                    var tile = char.IsWhiteSpace(c) ? null : new Tile(color);
+
+                    Tiles[x, y] = tile;
+                }
+            }
+        }
+
         public Tile[,] Tiles = new Tile[,]
         {
             {null, null, null, null},
@@ -47,55 +93,6 @@ namespace WpfApp1
             }
 
             Tiles = newTiles;
-        }
-
-        public static Figure CreateRandomFigure()
-        {
-            var r = new Random();
-            var figure = new Figure();
-            switch (r.Next(1, 5))
-            {
-                case 1:
-                    figure.Tiles = new Tile[,]
-                    {
-                        {null, new Tile(Colors.Red), new Tile(Colors.Red), null},
-                        {null, null, new Tile(Colors.Red), null},
-                        {null, null, new Tile(Colors.Red), null},
-                        {null, null, null, null}
-                    };
-                    break;
-                case 2:
-                    figure.Tiles = new Tile[,]
-                    {
-                        {null, new Tile(Colors.LawnGreen), new Tile(Colors.LawnGreen), null},
-                        {null, new Tile(Colors.LawnGreen), null, null},
-                        {null, new Tile(Colors.LawnGreen), null, null},
-                        {null, null, null, null}
-                    };
-                    break;
-                case 3:
-                    figure.Tiles = new Tile[,]
-                    {
-                        {null, null, null, null},
-                        {null, new Tile(Colors.Brown), new Tile(Colors.Brown), null},
-                        {null, new Tile(Colors.Brown), new Tile(Colors.Brown), null},
-                        {null, null, null, null}
-                    };
-                    break;
-                case 4:
-                    figure.Tiles = new Tile[,]
-                    {
-                        {null, new Tile(Colors.DeepSkyBlue), null, null},
-                        {null, new Tile(Colors.DeepSkyBlue), null, null},
-                        {null, new Tile(Colors.DeepSkyBlue), null, null},
-                        {null, new Tile(Colors.DeepSkyBlue), null, null}
-                    };
-                    break;
-
-                //todo add more figures
-            }
-
-            return figure;
         }
     }
 }
