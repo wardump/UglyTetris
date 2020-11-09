@@ -11,15 +11,15 @@ namespace WpfApp1
             _tileDrawer = tileDrawer;
         }
 
-        public void DrawField(Tile[,] field)
+        public void DrawField(Field field)
         {
-             var tiles = new List<TileXy>();
+            var tiles = new List<TileXy>();
 
-            for (var i = field.GetLowerBound(0); i <= field.GetUpperBound(0); i++)
+            for (var i = field.Xmin; i <= field.Xmax; i++)
             {
-                for (var j = field.GetLowerBound(1); j <= field.GetUpperBound(1); j++)
+                for (var j = field.Ymin; j <= field.Ymax; j++)
                 {
-                    var tile = field[i, j];
+                    var tile = field.GetTile(i, j);
                     if (tile != null)
                     {
                         tiles.Add(new TileXy() {Tile = tile, X = i, Y = j});

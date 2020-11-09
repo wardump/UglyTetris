@@ -1,6 +1,6 @@
 ﻿namespace WpfApp1
 {
-    internal class TileXy
+    public class TileXy
     {
         public Tile Tile { get; set; }
         public int X { get; set; }

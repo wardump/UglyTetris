@@ -26,7 +26,7 @@ namespace WpfApp1
             Game = new Game();
             Game.FigureStateChanged += GameOnFigureStateChanged;
             
-            Game.Field = CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight);
+            Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight, Colors.DimGray);
             Game.ResetFigure(_figureFactory.CreateRandomFigure());
 
             _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
@@ -40,7 +40,7 @@ namespace WpfApp1
             _timer.Start();
         }
 
-        private void GameOnFigureStateChanged(object? sender, EventArgs e)
+        private void GameOnFigureStateChanged(object sender, EventArgs e)
         {
             _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
         }
@@ -52,23 +52,7 @@ namespace WpfApp1
         private FieldDrawer _fieldDrawer;
         private FigureDrawer _figureDrawer;
 
-        private Tile[,] CreateField(int width, int height)
-        {
-            var field = new Tile[width + 2, height + 1];
-
-            for (var i = 0; i < height + 1; i++) // +1 each side for the walls
-            {
-                field[0, i] = new Tile(Colors.DimGray);
-                field[width + 1, i] = new Tile(Colors.DimGray);
-            }
-
-            for (var i = 1; i < width + 1; i++)
-            {
-                field[i, height] = new Tile(Colors.DimGray);
-            }
-
-            return field;
-        }
+        
         
 
         private void MoveLeft()

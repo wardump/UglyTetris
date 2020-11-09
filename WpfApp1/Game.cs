@@ -32,23 +32,12 @@ namespace WpfApp1
 
                 var w = MainWindow.Instance;
 
-                if (!Check(x, y))
+                if (!Field.IsPossibleToPlaceFigure(Figure, x, y))
                 {
-                    var f = Figure;
-                    for (var i = f.Tiles.GetLowerBound(0); i <= f.Tiles.GetUpperBound(0); i++)
-                    {
-                        for (var j = f.Tiles.GetLowerBound(1); j <= f.Tiles.GetUpperBound(1); j++)
-                        {
-                            if (f.Tiles[i, j] != null)
-                            {
-                                Field[FigurePositionX + i, FigurePositionY + j] = f.Tiles[i, j];
-                                f.Tiles[i, j] = null;
-                            }
-                        }
-                    }
-
-                    var lines = FieldHelper.CheckLines(Field);
-                    Lines += lines;
+                    Field.LockFigure(Figure, FigurePositionX, FigurePositionY, true);
+                    
+                    var lineCount = Field.RemoveFullLines();
+                    Lines += lineCount;
 
                     RaiseFigureStateChanged();
                     w.OnFigureLock();
@@ -69,7 +58,7 @@ namespace WpfApp1
         {
             FigurePositionX--;
 
-            if (!Check(FigurePositionX, FigurePositionY))
+            if (!Field.IsPossibleToPlaceFigure(Figure, FigurePositionX, FigurePositionY))
             {
                 FigurePositionX++;
                 return;
@@ -82,7 +71,7 @@ namespace WpfApp1
         {
             FigurePositionX++;
 
-            if (!Check(FigurePositionX, FigurePositionY))
+            if (!Field.IsPossibleToPlaceFigure(Figure, FigurePositionX, FigurePositionY))
             {
                 FigurePositionX--;
                 return;
@@ -94,7 +83,7 @@ namespace WpfApp1
         public void RotateAntiClockWise()
         {
             Figure.RotateLeft();
-            if (!Check(FigurePositionX, FigurePositionY))
+            if (!Field.IsPossibleToPlaceFigure(Figure, FigurePositionX, FigurePositionY))
             {
                 Figure.RotateRight();
             }
@@ -104,7 +93,7 @@ namespace WpfApp1
         public void RotateClockWise()
         {
             Figure.RotateRight();
-            if (!Check(FigurePositionX, FigurePositionY))
+            if (!Field.IsPossibleToPlaceFigure(Figure, FigurePositionX, FigurePositionY))
             {
                 Figure.RotateLeft();
             }
@@ -114,34 +103,6 @@ namespace WpfApp1
         public void Drop()
         {
             IsFalling = true;
-        }
-
-        public bool Check(int x, int y)
-        {
-            for (var i = x; i < x + Figure.Width; i++)
-            {
-                for (var j = y; j < y + Figure.Height; j++)
-                {
-                    var r = Figure.Tiles[i - x, j - y];
-                    if (r == null)
-                    {
-                        continue;
-                    }
-
-                    if (i < Field.GetLowerBound(0) || i > Field.GetUpperBound(0) ||
-                        j < Field.GetLowerBound(1) || j > Field.GetUpperBound(1))
-                    { //todo this check will be encapsulated in Field class
-                        return false;
-                    }
-                    
-                    if (Field[i, j] != null)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
 
         public Figure Figure { get; private set; } = new Figure();
@@ -157,14 +118,14 @@ namespace WpfApp1
 
         public int FigurePositionY { get; private set; } = 0;
 
-        public Tile[,] Field;
+        public Field Field;
 
         public bool ResetFigure(Figure newFigure)
         {
-            FigurePositionX = (Field.GetUpperBound(0) - Field.GetLowerBound(0)) / 2;
+            FigurePositionX = (Field.Xmax - Field.Xmin) / 2;
             FigurePositionY = 0;
 
-            if (FieldHelper.CheckFigure(Field, newFigure, FigurePositionX, FigurePositionY))
+            if (Field.IsPossibleToPlaceFigure(newFigure, FigurePositionX, FigurePositionY))
             {
                 Figure = newFigure;
                 return true;

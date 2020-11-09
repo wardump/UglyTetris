@@ -21,7 +21,7 @@ namespace Tests
 
             Tile TileF() => new Tile(Colors.Brown);
 
-            game.Field = new Tile[,]
+            game.Field = new Field(new Tile[,]
             {
                 // 0 -> Y
                 // | 
@@ -36,7 +36,7 @@ namespace Tests
                 {null, null, null, null, null, null, null, TileF(), },
                 {null, null, null, null, null, null, null, TileF(), },
                 {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
-            };
+            });
 
             var figureFactory = new FigureFactory();
 
