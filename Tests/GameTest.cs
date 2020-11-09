@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Media;
 using FluentAssertions;
 using WpfApp1;
@@ -18,15 +19,23 @@ namespace Tests
 
             var game = new Game();
 
+            Tile TileF() => new Tile(Colors.Brown);
+
             game.Field = new Tile[,]
             {
-                {new Tile(Colors.Brown), null, null, null, null, new Tile(Colors.Brown), },
-                {new Tile(Colors.Brown), null, null, null, null, new Tile(Colors.Brown), },
-                {new Tile(Colors.Brown), null, null, null, null, new Tile(Colors.Brown), },
-                {new Tile(Colors.Brown), null, null, null, null, new Tile(Colors.Brown), },
-                {new Tile(Colors.Brown), null, null, null, null, new Tile(Colors.Brown), },
-                {new Tile(Colors.Brown), null, null, null, null, new Tile(Colors.Brown), },
-                {new Tile(Colors.Brown), new Tile(Colors.Brown), new Tile(Colors.Brown), new Tile(Colors.Brown), new Tile(Colors.Brown), new Tile(Colors.Brown), },
+                // 0 -> Y
+                // | 
+                // v X 
+                {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
             };
 
             var figureFactory = new FigureFactory();
@@ -43,13 +52,26 @@ namespace Tests
 
             game.Figure.Should().NotBeEquivalentTo(notRotatedFigure);
 
-            //game.MoveLeft();
-            //game.MoveLeft();
-            //game.MoveLeft();
-            //game.MoveLeft();
-            //game.MoveLeft();
+            game.MoveLeft();
+            game.RotateAntiClockWise();
+            game.MoveLeft();
+            game.RotateAntiClockWise();
+            game.MoveLeft();
+            game.RotateAntiClockWise();
+            game.MoveLeft();
+            game.RotateAntiClockWise();
+            game.MoveLeft();
+            game.RotateAntiClockWise();
+            game.MoveLeft();
+            
+            // now the figure is at the most left
+            // the wall should not let it rotate
 
-
+            var figureAtLeftWallCopy = new Figure(game.Figure);
+            
+            game.RotateAntiClockWise();
+            
+            game.Figure.Should().BeEquivalentTo(figureAtLeftWallCopy);
         }
     }
 }

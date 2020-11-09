@@ -128,6 +128,12 @@ namespace WpfApp1
                         continue;
                     }
 
+                    if (i < Field.GetLowerBound(0) || i > Field.GetUpperBound(0) ||
+                        j < Field.GetLowerBound(1) || j > Field.GetUpperBound(1))
+                    { //todo this check will be encapsulated in Field class
+                        return false;
+                    }
+                    
                     if (Field[i, j] != null)
                     {
                         return false;
@@ -155,7 +161,7 @@ namespace WpfApp1
 
         public bool ResetFigure(Figure newFigure)
         {
-            FigurePositionX = 6; //todo calculate from field size
+            FigurePositionX = (Field.GetUpperBound(0) - Field.GetLowerBound(0)) / 2;
             FigurePositionY = 0;
 
             if (FieldHelper.CheckFigure(Field, newFigure, FigurePositionX, FigurePositionY))
