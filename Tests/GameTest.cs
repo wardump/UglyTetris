@@ -17,7 +17,7 @@ namespace Tests
             //   - figure
             // Game.RotateACW
 
-            var game = new Game();
+            var game = new Game(new NextFigureFactoryStub());
 
             Tile TileF() => new Tile(Colors.Brown);
 
@@ -72,6 +72,14 @@ namespace Tests
             game.RotateAntiClockWise();
             
             game.Figure.Should().BeEquivalentTo(figureAtLeftWallCopy);
+        }
+        
+        private class NextFigureFactoryStub : INextFigureFactory
+        {
+            public Figure GetNextFigure()
+            {
+                return new Figure();
+            }
         }
     }
 }

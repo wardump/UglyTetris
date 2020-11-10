@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace WpfApp1
 {
@@ -17,14 +13,15 @@ namespace WpfApp1
     {
         public MainWindow()
         {
-            Instance = this;
             InitializeComponent();
             
             _figureDrawer = new FigureDrawer(new TileDrawer(MainCanvas));
             _fieldDrawer = new FieldDrawer(new TileDrawer(MainCanvas));
 
-            Game = new Game();
+            Game = new Game(new RandomNextFigureFactory());
             Game.FigureStateChanged += GameOnFigureStateChanged;
+            Game.LinesChanged += GameOnLinesChanged;
+            Game.StateChanged += GameOnStateChanged;
             
             Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth-4, FieldHelper.FieldDefaultHeight, Colors.DimGray);
             Game.ResetFigure(_figureFactory.CreateRandomFigure());
@@ -38,6 +35,20 @@ namespace WpfApp1
             _timer.Tick += (sender, args) => { Game.Tick(); };
 
             _timer.Start();
+        }
+
+        private void GameOnStateChanged(object sender, EventArgs e)
+        {
+            if (Game.State == GameState.GameOver)
+            {
+                _timer.Stop();
+                MessageBox.Show("GAME OVER");
+            }
+        }
+
+        private void GameOnLinesChanged(object sender, EventArgs e)
+        {
+            LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
         }
 
         private void GameOnFigureStateChanged(object sender, EventArgs e)
@@ -85,22 +96,7 @@ namespace WpfApp1
             Game.Drop();
         }
         
-        public static MainWindow Instance;
-
         private FigureFactory _figureFactory = new FigureFactory();
-
-        public void OnFigureLock()
-        {
-            LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
-
-            var figure = _figureFactory.CreateRandomFigure();
-
-            if (!Game.ResetFigure(figure))
-            {
-               _timer.Stop();
-                MessageBox.Show("GAME OVER");
-            }
-        }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -149,5 +145,15 @@ namespace WpfApp1
         {
             Drop();
         }
+    }
+
+    internal class RandomNextFigureFactory : INextFigureFactory
+    {
+        public Figure GetNextFigure()
+        {
+            return _figureFactory.CreateRandomFigure();
+        }
+
+        readonly FigureFactory _figureFactory = new FigureFactory();
     }
 }

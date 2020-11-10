@@ -1,23 +1,54 @@
 ﻿
 using System;
-using System.Windows.Shapes;
 
 namespace WpfApp1
 {
     public class Game
     {
+        public Game(INextFigureFactory nextFigureFactory)
+        {
+            _nextFigureFactory = nextFigureFactory;
+        }
+        
         public bool IsFalling { get; set; }
 
         private int _tickCount = 0;
 
-        public int MoveDownPeriodTicks = 50;
+        int MoveDownPeriodTicks { get; } = 50;
 
-        public int FallDownPeriodTicks = 3;
+        private int FallDownPeriodTicks { get; } = 3;
 
-        public int Lines = 0;
+
+        private int _lines = 0;
+        public int Lines
+        {
+            get => _lines;
+            private set
+            {
+                _lines = value;
+                LinesChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+
+        private GameState _state = GameState.Running;
+        public GameState State
+        {
+            get => _state;
+            private set
+            {
+                _state = value;
+                StateChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         public void Tick()
         {
+            if (State == GameState.GameOver)
+            {
+                return;
+            }
+            
             _tickCount++;
 
             bool moveDown = IsFalling
@@ -30,8 +61,6 @@ namespace WpfApp1
                 var y = FigurePositionY + 1;
                 var x = FigurePositionX;
 
-                var w = MainWindow.Instance;
-
                 if (!Field.IsPossibleToPlaceFigure(Figure, x, y))
                 {
                     Field.LockFigure(Figure, FigurePositionX, FigurePositionY, true);
@@ -40,7 +69,13 @@ namespace WpfApp1
                     Lines += lineCount;
 
                     RaiseFigureStateChanged();
-                    w.OnFigureLock();
+
+                    var figure = _nextFigureFactory.GetNextFigure();
+
+                    if (!ResetFigure(figure))
+                    {
+                        State = GameState.GameOver;
+                    }
                     
                     _tickCount = 0;
                     IsFalling = false;
@@ -108,17 +143,23 @@ namespace WpfApp1
         public Figure Figure { get; private set; } = new Figure();
 
         public event EventHandler FigureStateChanged;
-
         protected void RaiseFigureStateChanged()
         {
             FigureStateChanged?.Invoke(this, EventArgs.Empty);
         }
+        
+        public event EventHandler LinesChanged; // may be replaced with INotifyPropertyChanged interface implementation
+        
+        public event EventHandler StateChanged; // may be replaced with INotifyPropertyChanged interface implementation
+
+        
 
         public int FigurePositionX { get; private set; } = 6;
 
         public int FigurePositionY { get; private set; } = 0;
 
         public Field Field;
+        
 
         public bool ResetFigure(Figure newFigure)
         {
@@ -133,5 +174,7 @@ namespace WpfApp1
 
             return false; //cannot reset figure
         }
+
+        private INextFigureFactory _nextFigureFactory;
     }
 }
