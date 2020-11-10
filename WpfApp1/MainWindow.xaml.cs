@@ -26,11 +26,11 @@ namespace WpfApp1
             Game = new Game();
             Game.FigureStateChanged += GameOnFigureStateChanged;
             
-            Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight, Colors.DimGray);
+            Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth-4, FieldHelper.FieldDefaultHeight, Colors.DimGray);
             Game.ResetFigure(_figureFactory.CreateRandomFigure());
 
             _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
-            _fieldDrawer.DrawField(Game.Field);
+            _fieldDrawer.AttachToField(Game.Field);
 
 
             _timer = new System.Windows.Threading.DispatcherTimer {Interval = TimeSpan.FromMilliseconds(10)};
@@ -91,7 +91,6 @@ namespace WpfApp1
 
         public void OnFigureLock()
         {
-            _fieldDrawer.DrawField(Game.Field);
             LineCountTextBlock.Text = Game.Lines.ToString(CultureInfo.InvariantCulture);
 
             var figure = _figureFactory.CreateRandomFigure();

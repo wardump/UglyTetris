@@ -13,6 +13,10 @@ namespace WpfApp1
             _canvas = canvas;
         }
 
+        /// <summary>
+        /// Draws or refreshes the set of tiles on canvas, removing all other tiles from the canvas 
+        /// </summary>
+        /// <param name="tiles"></param>
         public void DrawTiles(IEnumerable<TileXy> tiles)
         {
             var affectedTiles = new HashSet<Tile>();
@@ -31,8 +35,18 @@ namespace WpfApp1
             }
         }
 
-        private Rectangle DrawTile(TileXy tileXy)
+        /// <summary>
+        /// Refreshes the tile position or draws a new one if it did not exist in the canvas
+        /// </summary>
+        /// <param name="tileXy"></param>
+        /// <returns>Rectangle object mapped to the tile</returns>
+        public Rectangle DrawTile(TileXy tileXy)
         {
+            if (tileXy.Tile == null)
+            {
+                return null;
+            }
+            
             Rectangle rectangle;
 
             if (_tileRectangleMap.ContainsKey(tileXy.Tile))
@@ -49,6 +63,25 @@ namespace WpfApp1
             Canvas.SetTop(rectangle, tileXy.Y * FieldHelper.BlockHeight + 1);
 
             return rectangle;
+        }
+
+        /// <summary>
+        /// Removes the tile from canvas
+        /// </summary>
+        /// <param name="tile"></param>
+        public void RemoveTile(Tile tile)
+        {
+            if (tile == null)
+            {
+                return;
+            }
+            
+            if (_tileRectangleMap.ContainsKey(tile))
+            {
+                var rectangle = _tileRectangleMap[tile];
+                _canvas.Children.Remove(rectangle);
+                _tileRectangleMap.Remove(tile);
+            }
         }
 
         private Rectangle NewRectangle(Color color)

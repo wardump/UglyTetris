@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace WpfApp1
@@ -61,6 +62,21 @@ namespace WpfApp1
             return null;
         }
 
+        public IEnumerable<TileXy> GetTiles()
+        {
+            for (var i = Xmin; i <= Xmax; i++)
+            {
+                for (var j = Ymin; j <= Ymax; j++)
+                {
+                    var tile = GetTile(i, j);
+                    if (tile != null)
+                    {
+                        yield return new TileXy {Tile = tile, X = i, Y = j};
+                    }
+                }
+            }
+        }
+
         public void SetTile(int x, int y, Tile tile)
         {
             if (!IsInBounds(x, y))
@@ -90,6 +106,11 @@ namespace WpfApp1
 
             var movingTile = GetTile(x, y);
 
+            if (movingTile == null)
+            {
+                return;
+            }
+            
             _tiles[newX, newY] = movingTile;
             _tiles[x, y] = null;
             

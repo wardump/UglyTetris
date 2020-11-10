@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 
@@ -11,25 +13,52 @@ namespace WpfApp1
             _tileDrawer = tileDrawer;
         }
 
-        public void DrawField(Field field)
+        public void AttachToField(Field field)
         {
-            var tiles = new List<TileXy>();
-
-            for (var i = field.Xmin; i <= field.Xmax; i++)
+            if (_field != null)
             {
-                for (var j = field.Ymin; j <= field.Ymax; j++)
-                {
-                    var tile = field.GetTile(i, j);
-                    if (tile != null)
-                    {
-                        tiles.Add(new TileXy() {Tile = tile, X = i, Y = j});
-                    }
-                }
+                DetachFromField();
             }
 
-            _tileDrawer.DrawTiles(tiles);
+            _field = field;
+            DrawField(field);
+            
+            field.TileChanged += FieldOnTileChanged;
+        }
+
+        public void DetachFromField()
+        {
+            if (_field != null)
+            {
+                _field.TileChanged -= FieldOnTileChanged;
+            }
+            
+            _tileDrawer.DrawTiles(Enumerable.Empty<TileXy>());
+        }
+
+        private void FieldOnTileChanged(object sender, TileChangedEventArgs e)
+        {
+            if (e.IsMove() || e.IsAdd())
+            {
+                _tileDrawer.DrawTile(e.NewTile);
+            }
+            else if (e.IsDelete())
+            {
+                _tileDrawer.RemoveTile(e.OldTile.Tile);
+            }
+            else
+            {
+                _tileDrawer.RemoveTile(e.OldTile.Tile);
+                _tileDrawer.DrawTile(e.NewTile);
+            }
+        }
+
+        public void DrawField(Field field)
+        {
+            _tileDrawer.DrawTiles(field.GetTiles());
         }
 
         private readonly TileDrawer _tileDrawer;
+        private Field _field;
     }
 }
