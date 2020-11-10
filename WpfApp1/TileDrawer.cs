@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using UglyTetris.GameLogic;
 
 namespace WpfApp1
 {
@@ -55,7 +56,8 @@ namespace WpfApp1
             }
             else
             {
-                rectangle = NewRectangle(tileXy.Tile.Color);
+                var color = (Color)ColorConverter.ConvertFromString(tileXy.Tile.Color);
+                rectangle = NewRectangle(color);
                 _tileRectangleMap.Add(tileXy.Tile, rectangle);
             }
 

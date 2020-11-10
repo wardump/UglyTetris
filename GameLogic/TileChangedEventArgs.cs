@@ -1,6 +1,6 @@
 using System;
 
-namespace WpfApp1
+namespace UglyTetris.GameLogic
 {
     public class TileChangedEventArgs: EventArgs
     {

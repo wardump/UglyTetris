@@ -1,9 +1,6 @@
-using System;
-using System.Windows.Media;
 using FluentAssertions;
-using WpfApp1;
+using UglyTetris.GameLogic;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Tests
 {
@@ -83,8 +80,8 @@ namespace Tests
         [InlineData("  x \r\n  x \r\n  x \r\n  x ", "    \r\nxxxx\r\n    \r\n    ")]
         public void RotateLeft(string figureTiles, string figureTilesRotated)
         {
-            var figure = new Figure(figureTiles, Colors.Yellow);
-            var figureRotated = new Figure(figureTilesRotated, Colors.Yellow);
+            var figure = new Figure(figureTiles, "Yellow");
+            var figureRotated = new Figure(figureTilesRotated, "Yellow");
 
             figure.RotateLeft();
 

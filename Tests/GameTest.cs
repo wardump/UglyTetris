@@ -1,7 +1,5 @@
-using System;
-using System.Windows.Media;
 using FluentAssertions;
-using WpfApp1;
+using UglyTetris.GameLogic;
 using Xunit;
 
 namespace Tests
@@ -19,7 +17,7 @@ namespace Tests
 
             var game = new Game(new NextFigureFactoryStub());
 
-            Tile TileF() => new Tile(Colors.Brown);
+            Tile TileF() => new Tile("Brown");
 
             game.Field = new Field(new Tile[,]
             {

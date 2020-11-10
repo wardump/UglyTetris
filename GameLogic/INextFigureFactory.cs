@@ -1,4 +1,4 @@
-namespace WpfApp1
+namespace UglyTetris.GameLogic
 {
     public interface INextFigureFactory
     {

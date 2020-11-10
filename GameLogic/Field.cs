@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Media;
 
-namespace WpfApp1
+namespace UglyTetris.GameLogic
 {
     public class Field
     {
@@ -11,7 +10,7 @@ namespace WpfApp1
             _tiles = initialTiles;
         }
         
-        public static Field CreateField(int width, int height, Color color)
+        public static Field CreateField(int width, int height, string color)
         {
             var tiles = new Tile[width + 2, height + 1];
 
@@ -23,7 +22,7 @@ namespace WpfApp1
 
             for (var i = 1; i < width + 1; i++)
             {
-                tiles[i, height] = new Tile(Colors.DimGray);
+                tiles[i, height] = new Tile("DimGray");
             }
 
             return new Field(tiles);

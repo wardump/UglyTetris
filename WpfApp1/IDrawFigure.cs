@@ -1,4 +1,6 @@
-﻿namespace WpfApp1
+﻿using UglyTetris.GameLogic;
+
+namespace WpfApp1
 {
     public interface IDrawFigure
     {

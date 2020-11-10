@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using UglyTetris.GameLogic;
 
 namespace WpfApp1
 {
@@ -23,7 +24,7 @@ namespace WpfApp1
             Game.LinesChanged += GameOnLinesChanged;
             Game.StateChanged += GameOnStateChanged;
             
-            Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth-4, FieldHelper.FieldDefaultHeight, Colors.DimGray);
+            Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight, "DimGray");
             Game.ResetFigure(_figureFactory.CreateRandomFigure());
 
             _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
