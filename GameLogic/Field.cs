@@ -5,6 +5,13 @@ namespace UglyTetris.GameLogic
 {
     public class Field
     {
+        public int Xmin => _tiles.GetLowerBound(0);
+        public int Xmax => _tiles.GetUpperBound(0);
+        public int Width => Xmax - Xmin;
+        public int Ymin => _tiles.GetLowerBound(1);
+        public int Ymax => _tiles.GetUpperBound(1);
+        public int Height => Ymax - Ymin;
+        
         public Field(Tile[,] initialTiles)
         {
             _tiles = initialTiles;
@@ -27,38 +34,20 @@ namespace UglyTetris.GameLogic
 
             return new Field(tiles);
         }
-        
-        public int Xmin => _tiles.GetLowerBound(0);
-        public int Xmax => _tiles.GetUpperBound(0);
-        public int Width => Xmax - Xmin;
-        public int Ymin => _tiles.GetLowerBound(1);
-        public int Ymax => _tiles.GetUpperBound(1);
 
-        public int Height => Ymax - Ymin;
-
-        public bool IsInBounds(int x, int y)
+        private bool IsInBounds(int x, int y)
         {
             return x >= Xmin && x <= Xmax && y >= Ymin && y <= Ymax;
         }
 
         public bool IsEmpty(int x, int y)
         {
-            if (!IsInBounds(x, y))
-            {
-                return false;
-            }
-
-            return _tiles[x, y] == null;
+            return IsInBounds(x, y) && _tiles[x, y] == null;
         }
-        
-        public Tile GetTile(int x, int y)
-        {
-            if (IsInBounds(x, y))
-            {
-                return _tiles[x, y];
-            }
 
-            return null;
+        private Tile GetTile(int x, int y)
+        {
+            return IsInBounds(x, y) ? _tiles[x, y] : null;
         }
 
         public IEnumerable<TileXy> GetTiles()
@@ -76,7 +65,7 @@ namespace UglyTetris.GameLogic
             }
         }
 
-        public void SetTile(int x, int y, Tile tile)
+        public bool SetTile(int x, int y, Tile tile)
         {
             if (!IsInBounds(x, y))
             {
@@ -85,16 +74,21 @@ namespace UglyTetris.GameLogic
 
             var oldTile = _tiles[x, y];
 
-            if (oldTile != tile)
+            if (oldTile == tile)
             {
-                _tiles[x, y] = tile;
-                RaiseTileChanged(
-                    new TileXy{Tile = oldTile, X = x, Y = y}, 
-                    new TileXy{Tile = tile, X = x, Y = y});
+                return false;
             }
+            
+            _tiles[x, y] = tile;
+            var tileXyOld = new TileXy {Tile = oldTile, X = x, Y = y};
+            var tileXyNew = new TileXy {Tile = tile, X = x, Y = y};
+
+            RaiseTileChanged(tileXyOld, tileXyNew);
+
+            return true;
         }
 
-        public void MoveTile(int x, int y, int newX, int newY)
+        private void MoveTile(int x, int y, int newX, int newY)
         {
             var replacedTile = GetTile(newX, newY);
 
@@ -112,15 +106,16 @@ namespace UglyTetris.GameLogic
             
             _tiles[newX, newY] = movingTile;
             _tiles[x, y] = null;
-            
-            RaiseTileChanged(
-                new TileXy() {Tile = movingTile, X = x, Y = y},
-                new TileXy(){Tile = movingTile, X = newX, Y = newY});
+
+            var oldTileXy = new TileXy() {Tile = movingTile, X = x, Y = y};
+            var newTileXy = new TileXy() {Tile = movingTile, X = newX, Y = newY};
+
+            RaiseTileChanged(oldTileXy, newTileXy);
         }
 
         public event EventHandler<TileChangedEventArgs> TileChanged;
-        
-        protected void RaiseTileChanged(TileXy oldTile, TileXy newTile)
+
+        private void RaiseTileChanged(TileXy oldTile, TileXy newTile)
         {
             TileChanged?.Invoke(this, new TileChangedEventArgs(oldTile, newTile));
         }
@@ -146,28 +141,28 @@ namespace UglyTetris.GameLogic
             for (var i = Ymin; i < Ymax; i++)
             {
                 var isFull = true;
+                
                 for (var x = left; x <= right ; x++) // check line
                 {
-                    if (_tiles[x, i] == null)
-                    {
-                        isFull = false;
-                        break;
-                    }
+                    if (_tiles[x, i] != null) continue;
+                    
+                    isFull = false;
+                    break;
                 }
 
-                if (isFull)
+                if (!isFull) continue;
+                
+                // remove the line
+                remove++;
+
+                for (var x = left; x <= right; x++)
                 {
-                    // remove the line
-                    remove++;
-
-                    for (var x = left; x <= right; x++)
+                    for (var y = i - 1; y >= 0; y--)
                     {
-                        for (var y = i - 1; y >= 0; y--)
-                        {
-                            MoveTile(x, y, x, y + 1);
-                        }
+                        MoveTile(x, y, x, y + 1);
                     }
                 }
+                
             }
 
             return remove;
@@ -176,11 +171,11 @@ namespace UglyTetris.GameLogic
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="f"></param>
+        /// <param name="figure"></param>
         /// <param name="figureX"></param>
         /// <param name="figureY"></param>
         /// <returns></returns>
-        public bool IsPossibleToPlaceFigure(Figure f, int figureX, int figureY)
+        public bool IsPossibleToPlaceFigure(Figure figure, int figureX, int figureY)
         {
             // this code assumes that the left and right columns and the bottom row 
             // are the walls, and the game area is inside of it
@@ -192,19 +187,18 @@ namespace UglyTetris.GameLogic
             var right = Xmax - 1;
             var bottom = Ymax - 1;
 
-            for (var i = f.Tiles.GetLowerBound(0); i <= f.Tiles.GetUpperBound(0); i++)
+            for (var i = figure.Tiles.GetLowerBound(0); i <= figure.Tiles.GetUpperBound(0); i++)
             {
-                for (var j = f.Tiles.GetLowerBound(1); j <= f.Tiles.GetUpperBound(1); j++)
+                for (var j = figure.Tiles.GetLowerBound(1); j <= figure.Tiles.GetUpperBound(1); j++)
                 {
-                    if (f.Tiles[i, j] != null)
-                    {
-                        var figureTileX = figureX + i;
-                        var figureTileY = figureY + j;
+                    if (figure.Tiles[i, j] == null) continue;
+                    
+                    var figureTileX = figureX + i;
+                    var figureTileY = figureY + j;
 
-                        if (!IsEmpty(figureTileX, figureTileY))
-                        {
-                            return false;
-                        }
+                    if (!IsEmpty(figureTileX, figureTileY))
+                    {
+                        return false;
                     }
                 }
             }
@@ -212,20 +206,19 @@ namespace UglyTetris.GameLogic
             return true;
         }
 
-        public void LockFigure(Figure f, int x, int y, bool removeTilesFromFigure)
+        public void LockFigure(Figure figure, int x, int y, bool removeTilesFromFigure)
         {
-            for (var i = f.Tiles.GetLowerBound(0); i <= f.Tiles.GetUpperBound(0); i++)
+            for (var i = figure.Tiles.GetLowerBound(0); i <= figure.Tiles.GetUpperBound(0); i++)
             {
-                for (var j = f.Tiles.GetLowerBound(1); j <= f.Tiles.GetUpperBound(1); j++)
+                for (var j = figure.Tiles.GetLowerBound(1); j <= figure.Tiles.GetUpperBound(1); j++)
                 {
-                    if (f.Tiles[i, j] != null)
-                    {
-                        SetTile(x + i, y + j, f.Tiles[i, j]);
+                    if (figure.Tiles[i, j] == null) continue;
+                    
+                    SetTile(x + i, y + j, figure.Tiles[i, j]);
 
-                        if (removeTilesFromFigure)
-                        {
-                            f.Tiles[i, j] = null;
-                        }
+                    if (removeTilesFromFigure)
+                    {
+                        figure.Tiles[i, j] = null;
                     }
                 }
             }

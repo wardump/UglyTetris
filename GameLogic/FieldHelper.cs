@@ -1,11 +1,11 @@
 ﻿namespace UglyTetris.GameLogic
 {
-    public static class FieldHelper
+    public readonly struct FieldКdHelper
     {
-        public static double BlockWidth = 20;
-        public static double BlockHeight = 20;
+        public const double BlockWidth = 20;
+        public const double BlockHeight = 20;
 
-        public static int FieldDefaultWidth = 12;
-        public static int FieldDefaultHeight = 24;
+        public const int FieldDefaultWidth = 12;
+        public const int FieldDefaultHeight = 24;
     }
 }

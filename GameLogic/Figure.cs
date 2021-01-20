@@ -5,6 +5,9 @@ namespace UglyTetris.GameLogic
 {
     public class Figure
     {
+        public int Width => Tiles.GetUpperBound(0) + 1;
+        public int Height => Tiles.GetUpperBound(1) + 1;
+        
         public Figure()
         {
             
@@ -36,12 +39,7 @@ namespace UglyTetris.GameLogic
                 var line = lines[y];
                 for (var x = 0; x < width; x++)
                 {
-                    char c = ' ';
-
-                    if (x < line.Length)
-                    {
-                        c = line[x];
-                    }
+                    var c = (x < line.Length) ? line[x] : ' ';
 
                     var tile = char.IsWhiteSpace(c) ? null : new Tile(color);
 
@@ -58,9 +56,6 @@ namespace UglyTetris.GameLogic
             {null, null, null, null}
         };
 
-        public int Width => Tiles.GetUpperBound(0) + 1;
-        public int Height => Tiles.GetUpperBound(1) + 1;
-        
         public void RotateLeft()
         {
             var newTiles = new Tile[Height, Width]; // rotation swaps coordinates
