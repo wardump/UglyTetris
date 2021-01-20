@@ -1,6 +1,6 @@
 ﻿namespace UglyTetris.GameLogic
 {
-    public readonly struct FieldКdHelper
+    public readonly struct FieldHelper
     {
         public const double BlockWidth = 20;
         public const double BlockHeight = 20;

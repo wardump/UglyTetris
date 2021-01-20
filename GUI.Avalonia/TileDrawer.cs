@@ -61,6 +61,7 @@ namespace UglyTetris.AvaloniaGUI
                 rectangle = NewRectangle(color); 
                 _tileRectangleMap.Add(tileXy.Tile, rectangle);
             }
+
             Canvas.SetLeft(rectangle, tileXy.X * FieldHelper.BlockWidth + 1);
             Canvas.SetTop(rectangle, tileXy.Y * FieldHelper.BlockHeight + 1);
 
@@ -77,13 +78,12 @@ namespace UglyTetris.AvaloniaGUI
             {
                 return;
             }
+
+            if (!_tileRectangleMap.ContainsKey(tile)) return;
             
-            if (_tileRectangleMap.ContainsKey(tile))
-            {
-                var rectangle = _tileRectangleMap[tile];
-                _canvas.Children.Remove(rectangle);
-                _tileRectangleMap.Remove(tile);
-            }
+            var rectangle = _tileRectangleMap[tile];
+            _canvas.Children.Remove(rectangle);
+            _tileRectangleMap.Remove(tile);
         }
 
         private Rectangle NewRectangle(Color color)
