@@ -107,7 +107,17 @@ namespace UglyTetris.AvaloniaGUI
         {
             Game.Drop();
         }
-        
+
+        private void CaptureFigure()
+        {
+            Game.CaptureFigure();
+        }
+
+        private void DismissFigure()
+        {
+            Game.DismissFigure();
+        }
+
         private FigureFactory _figureFactory = new FigureFactory();
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -128,10 +138,17 @@ namespace UglyTetris.AvaloniaGUI
             {
                 RotateClockWise();
             }
-
             else if (e.Key == Key.Space)
             {
                 Drop();
+            }
+            else if (e.Key == Key.C)
+            {
+                CaptureFigure();
+            }
+            else if (e.Key == Key.D)
+            {
+                DismissFigure();
             }
         }
         private void Button_Click_1(object sender, RoutedEventArgs e)

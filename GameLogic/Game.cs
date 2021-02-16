@@ -166,6 +166,26 @@ namespace UglyTetris.GameLogic
 
         }
 
+        private Figure CapturedFigure { get; set; } = null;
+
+        public bool CaptureFigure()
+        {
+            if (CapturedFigure != null) return false;
+            
+            CapturedFigure = Figure;
+            var nextFigure = _nextFigureFactory.GetNextFigure();
+            ResetFigure(nextFigure);
+            return true;
+        }
+
+        public bool DismissFigure()
+        {
+            if (CapturedFigure == null) return false;
+            ResetFigure(CapturedFigure);
+            CapturedFigure = null;
+            return true;
+        }
+
         private INextFigureFactory _nextFigureFactory;
     }
 }

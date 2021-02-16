@@ -72,6 +72,80 @@ namespace Tests2
             game.Figure.Should().BeEquivalentTo(figureAtLeftWallCopy);
         }
         
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CaptureFigure(bool isCaptured)
+        {
+            var game = new Game(new NextFigureFactoryStub());
+            
+            Tile TileF() => new Tile("Brown");
+
+            game.Field = new Field(new Tile[,]
+            {
+                // 0 -> Y
+                // | 
+                // v X 
+                {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
+            });
+            
+            var figureFactory = new FigureFactory();
+            
+            if (isCaptured)
+            {
+                game.ResetFigure(figureFactory.CreateRandomFigure());
+                game.CaptureFigure();
+            }
+
+            game.CaptureFigure().Should().Be(!isCaptured);
+        }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void DismissFigure(bool isCaptured)
+        {
+            var game = new Game(new NextFigureFactoryStub());
+            
+            Tile TileF() => new Tile("Brown");
+
+            game.Field = new Field(new Tile[,]
+            {
+                // 0 -> Y
+                // | 
+                // v X 
+                {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {null, null, null, null, null, null, null, TileF(), },
+                {TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), TileF(), },
+            });
+            
+            var figureFactory = new FigureFactory();
+            
+            if (isCaptured)
+            {
+                game.ResetFigure(figureFactory.CreateRandomFigure());
+                game.CaptureFigure();
+            }
+
+            game.DismissFigure().Should().Be(isCaptured);
+        }
+
         private class NextFigureFactoryStub : INextFigureFactory
         {
             public Figure GetNextFigure()
