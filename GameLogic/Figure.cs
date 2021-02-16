@@ -5,8 +5,21 @@ namespace UglyTetris.GameLogic
 {
     public class Figure
     {
-        public int Width => Tiles.GetUpperBound(0) + 1;
-        public int Height => Tiles.GetUpperBound(1) + 1;
+        private Tile[,] _tiles = new Tile[,]
+        {
+            {null, null, null, null},
+            {null, null, null, null},
+            {null, null, null, null},
+            {null, null, null, null}
+        };
+
+        public Tile[,] GetTiles()
+        {
+            return _tiles;
+        }
+
+        public int Width => _tiles.GetUpperBound(0) + 1;
+        public int Height => _tiles.GetUpperBound(1) + 1;
         
         public Figure()
         {
@@ -15,13 +28,13 @@ namespace UglyTetris.GameLogic
 
         public Figure(Figure figure)
         {
-            Tiles = new Tile[figure.Width, figure.Height];
+            _tiles = new Tile[figure.Width, figure.Height];
 
             for (var x = 0; x < figure.Width; x++)
             for (var y = 0; y < figure.Height; y++)
             {
-                var tile = figure.Tiles[x, y];
-                Tiles[x, y] = tile == null ? null : new Tile(tile.Color);
+                var tile = figure._tiles[x, y];
+                _tiles[x, y] = tile == null ? null : new Tile(tile.Color);
             }
         }
 
@@ -32,7 +45,7 @@ namespace UglyTetris.GameLogic
             var width = lines.Max(l => l.Length);
             var height = lines.Length;
 
-            Tiles = new Tile[width, height];
+            _tiles = new Tile[width, height];
 
             for (var y = 0; y < height; y++)
             {
@@ -43,18 +56,10 @@ namespace UglyTetris.GameLogic
 
                     var tile = char.IsWhiteSpace(c) ? null : new Tile(color);
 
-                    Tiles[x, y] = tile;
+                    _tiles[x, y] = tile;
                 }
             }
         }
-
-        public Tile[,] Tiles = new Tile[,]
-        {
-            {null, null, null, null},
-            {null, null, null, null},
-            {null, null, null, null},
-            {null, null, null, null}
-        };
 
         public void RotateLeft()
         {
@@ -64,11 +69,11 @@ namespace UglyTetris.GameLogic
             {
                 for (var j = 0; j < Height; j++)
                 {
-                    newTiles[j, Width - i - 1] = Tiles[i, j];
+                    newTiles[j, Width - i - 1] = _tiles[i, j];
                 }
             }
 
-            Tiles = newTiles;
+            _tiles = newTiles;
         }
 
         public void RotateRight()
@@ -79,11 +84,11 @@ namespace UglyTetris.GameLogic
             {
                 for (var j = 0; j < Height; j++)
                 {
-                    newTiles[Height - j - 1, i] = Tiles[i, j];
+                    newTiles[Height - j - 1, i] = _tiles[i, j];
                 }
             }
 
-            Tiles = newTiles;
+            _tiles = newTiles;
         }
     }
 }

@@ -187,11 +187,11 @@ namespace UglyTetris.GameLogic
             var right = Xmax - 1;
             var bottom = Ymax - 1;
 
-            for (var i = figure.Tiles.GetLowerBound(0); i <= figure.Tiles.GetUpperBound(0); i++)
+            for (var i = figure.GetTiles().GetLowerBound(0); i <= figure.GetTiles().GetUpperBound(0); i++)
             {
-                for (var j = figure.Tiles.GetLowerBound(1); j <= figure.Tiles.GetUpperBound(1); j++)
+                for (var j = figure.GetTiles().GetLowerBound(1); j <= figure.GetTiles().GetUpperBound(1); j++)
                 {
-                    if (figure.Tiles[i, j] == null) continue;
+                    if (figure.GetTiles()[i, j] == null) continue;
                     
                     var figureTileX = figureX + i;
                     var figureTileY = figureY + j;
@@ -208,17 +208,17 @@ namespace UglyTetris.GameLogic
 
         public void LockFigure(Figure figure, int x, int y, bool removeTilesFromFigure)
         {
-            for (var i = figure.Tiles.GetLowerBound(0); i <= figure.Tiles.GetUpperBound(0); i++)
+            for (var i = figure.GetTiles().GetLowerBound(0); i <= figure.GetTiles().GetUpperBound(0); i++)
             {
-                for (var j = figure.Tiles.GetLowerBound(1); j <= figure.Tiles.GetUpperBound(1); j++)
+                for (var j = figure.GetTiles().GetLowerBound(1); j <= figure.GetTiles().GetUpperBound(1); j++)
                 {
-                    if (figure.Tiles[i, j] == null) continue;
+                    if (figure.GetTiles()[i, j] == null) continue;
                     
-                    SetTile(x + i, y + j, figure.Tiles[i, j]);
+                    SetTile(x + i, y + j, figure.GetTiles()[i, j]);
 
                     if (removeTilesFromFigure)
                     {
-                        figure.Tiles[i, j] = null;
+                        figure.GetTiles()[i, j] = null;
                     }
                 }
             }

@@ -12,7 +12,7 @@ namespace UglyTetris.AvaloniaGUI
             for(var i = 0; i < figure.Width; i++)
             for (var j = 0; j < figure.Height; j++)
             {
-                var tile = figure.Tiles[i, j];
+                var tile = figure.GetTiles()[i, j];
                 if (tile != null)
                 {
                     tiles.Add(new TileXy(){Tile = tile, X = x + i, Y = y+j});
