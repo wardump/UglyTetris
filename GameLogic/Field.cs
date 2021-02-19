@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UglyTetris.GameLogic
 {
@@ -28,6 +29,30 @@ namespace UglyTetris.GameLogic
             }
 
             for (var i = 1; i < width + 1; i++)
+            {
+                tiles[i, height] = new Tile("DimGray");
+            }
+
+            return new Field(tiles);
+        }
+        
+        public static Field CreateCustomField(int width, int height, double delta,  string color)
+        {
+            var tiles = new Tile[width + 2, height + 1];
+
+            double side_1 = 0;
+            double side_2 = width + 1;
+            
+            for (var i = 0; i < height + 1; i++) // +1 each side for the walls
+            {
+                tiles[(int) Math.Ceiling(side_1), i] = new Tile(color);
+                tiles[(int) Math.Ceiling(side_2), i] = new Tile(color);
+
+                side_1 += delta;
+                side_2 -= delta;
+            }
+        
+            for (var i = (int) Math.Ceiling(side_1); i < (int) Math.Ceiling(side_2) + 1; i++)
             {
                 tiles[i, height] = new Tile("DimGray");
             }
@@ -119,8 +144,27 @@ namespace UglyTetris.GameLogic
         {
             TileChanged?.Invoke(this, new TileChangedEventArgs(oldTile, newTile));
         }
+
+        private int GetLeft(Tile[] row)
+        {
+            for (var i = 0; i < row.Length; i++)
+            {
+                if (row[i] != null) return i;
+            }
+
+            return -1;
+        }
         
-        
+        private int GetRigt(Tile[] row)
+        {
+            for (var i = row.Length - 1; i > 0; i--)
+            {
+                if (row[i] != null) return i;
+            }
+
+            return -1;
+        }
+
         /// <summary>
         /// Removes full lines from the field, shifts down the field tiles above the removed lines.
         /// </summary>
@@ -137,11 +181,18 @@ namespace UglyTetris.GameLogic
             var right = Xmax - 1;
 
             var remove = 0;
-
+            
             for (var i = Ymin; i < Ymax; i++)
             {
                 var isFull = true;
                 
+                var row = Enumerable.Range(0, _tiles.GetLength(0))
+                    .Select(x => _tiles[x, i])
+                    .ToArray();
+
+                left = GetLeft(row) + 1;
+                right = GetRigt(row) - 1;
+
                 for (var x = left; x <= right ; x++) // check line
                 {
                     if (_tiles[x, i] != null) continue;

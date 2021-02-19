@@ -27,7 +27,10 @@ namespace UglyTetris.AvaloniaGUI
             Game.LinesChanged += GameOnLinesChanged;
             Game.StateChanged += GameOnStateChanged;
             
-            Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight, "DimGray");
+            //Game.Field = Field.CreateField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight, "DimGray")
+            Game.Field = Field.CreateCustomField(FieldHelper.FieldDefaultWidth, FieldHelper.FieldDefaultHeight, 0.2, "DimGray");
+                
+                
             Game.ResetFigure(_figureFactory.CreateRandomFigure());
 
             _figureDrawer.DrawFigure(Game.Figure, Game.FigurePositionX, Game.FigurePositionY);
