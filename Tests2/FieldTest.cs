@@ -61,7 +61,8 @@ namespace Tests2
                     {null, null, null, null, null, T(), T(), T(),},
                     {T(), T(), T(), T(), T(), T(), T(), T(),},
                 }
-            )
+            ),
+            Field.CreateCustomField(8, 10, 0.2, "DimGray")
         };
 
 
@@ -69,6 +70,7 @@ namespace Tests2
         [InlineData(0, 1)]
         [InlineData(1, 2)]
         [InlineData(2, 0)]
+        [InlineData(3, 0)]
         public void RemoveLines(int fieldIndex, int lineCount)
         {
             var field = Fields[fieldIndex];
@@ -87,6 +89,7 @@ namespace Tests2
         
         [Theory]
         [InlineData(0)]
+        [InlineData(3)]
         public void CheckDownFigureFail(int fieldIndex)
         {
             var field = Fields[fieldIndex];
@@ -97,6 +100,7 @@ namespace Tests2
 
         [Theory]
         [InlineData(0)]
+        [InlineData(3)]
         public void CheckSetTileToMissField(int fieldIndex)
         {
             var field = Fields[fieldIndex];
@@ -117,16 +121,18 @@ namespace Tests2
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]
+        [InlineData(3)]
         public void CheckFillTileSuccess(int fieldIndex)
         {
             var field = Fields[fieldIndex];
-            field.IsEmpty(1, 6).Should().Be(false);
+            field.IsEmpty(1, 1).Should().Be(false);
         }
         
         [Theory]
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]
+        [InlineData(3)]
         public void CheckFillTileFail(int fieldIndex)
         {
             var field = Fields[fieldIndex];

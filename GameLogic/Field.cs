@@ -36,7 +36,7 @@ namespace UglyTetris.GameLogic
             return new Field(tiles);
         }
         
-        public static Field CreateCustomField(int width, int height, double delta,  string color)
+        public static Field CreateCustomField(int width, int height, double slopeRatio ,  string color)
         {
             var tiles = new Tile[width + 2, height + 1];
 
@@ -48,13 +48,13 @@ namespace UglyTetris.GameLogic
                 tiles[(int) Math.Ceiling(side_1), i] = new Tile(color);
                 tiles[(int) Math.Ceiling(side_2), i] = new Tile(color);
 
-                side_1 += delta;
-                side_2 -= delta;
+                side_1 += slopeRatio;
+                side_2 -= slopeRatio;
             }
         
             for (var i = (int) Math.Ceiling(side_1); i < (int) Math.Ceiling(side_2) + 1; i++)
             {
-                tiles[i, height] = new Tile("DimGray");
+                tiles[i, height] = new Tile(color);
             }
 
             return new Field(tiles);
@@ -145,21 +145,21 @@ namespace UglyTetris.GameLogic
             TileChanged?.Invoke(this, new TileChangedEventArgs(oldTile, newTile));
         }
 
-        private int GetLeft(Tile[] row)
+        private int GetLeftFieldIndex(Tile[] row)
         {
             for (var i = 0; i < row.Length; i++)
             {
-                if (row[i] != null) return i;
+                if (row[i] != null) return i + 1;
             }
 
             return -1;
         }
         
-        private int GetRigt(Tile[] row)
+        private int GetRightFieldIndex(Tile[] row)
         {
             for (var i = row.Length - 1; i > 0; i--)
             {
-                if (row[i] != null) return i;
+                if (row[i] != null) return i - 1;
             }
 
             return -1;
@@ -190,8 +190,8 @@ namespace UglyTetris.GameLogic
                     .Select(x => _tiles[x, i])
                     .ToArray();
 
-                left = GetLeft(row) + 1;
-                right = GetRigt(row) - 1;
+                left = GetLeftFieldIndex(row);
+                right = GetRightFieldIndex(row);
 
                 for (var x = left; x <= right ; x++) // check line
                 {
